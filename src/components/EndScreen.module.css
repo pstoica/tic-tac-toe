@@ -1,11 +1,8 @@
+/* transparent pass-through — the endCard itself is the visual focus;
+   no modal backdrop / blur layer needed around it */
 .end {
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
-  background: oklch(6% 0.02 280 / 0.55);
-  backdrop-filter: blur(12px);
-  z-index: 5;
   padding: 8px;
 }
 
