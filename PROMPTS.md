@@ -125,3 +125,11 @@ A running log of prompts supplied during this interview-project build.
 > let's also provide a way to reset history.
 >
 > and let's make the difficulty selection feel more like a list of cards with stars, maintaining characterful type (e.g. wonky random rotation)
+
+---
+
+## Prompt 17 — 2026-04-22
+
+> similar optical alignment issue with this X reset button.
+>
+> for the ghost animations.. lets actually make it feel a bit more like randomly placed collision particles instead of all scaling down to the center.

@@ -66,47 +66,45 @@ function prand(i: number, stream: number): number {
   const v = Math.sin(i * 12.9898 + stream * 78.233) * 43758.5453;
   return v - Math.floor(v);
 }
-const jitter = (i: number, stream: number, amp: number): number =>
-  (prand(i, stream) - 0.5) * 2 * amp;
 
-/* LERP trail on placement (iOS FaceID style): each ghost is a frozen pose;
-   only opacity animates, the stagger of flashes creates the motion.
+/* collision-particle burst on placement: each ghost is a static, independent
+   snapshot — scattered at a random radial offset from the placement point,
+   at its own scale/rotation/3D-tilt — and only opacity animates. the
+   stagger of flashes + scattered positions reads as debris catching a
+   strobe, not a uniform shrink toward the center.
 
-   each ghost layers a smooth trajectory + per-ghost deterministic jitter
-   so adjacent frames aren't just the next point on the same clean curve:
-     - base knurl rotation + rotation jitter ±18°
-     - shrink trajectory + per-axis independent scale jitter (non-uniform
-       per ghost, some wider-than-tall, some taller-than-wide)
-     - 3D tilt sine curves + rotateX/Y jitter (renders when the renderer
-       honors SVG 3D; even flat it affects scale via foreshortening)
-     - small position jitter so ghosts don't all pin to the exact center
-     - per-ghost opacity peak and lifetime so some flash brighter/longer */
+   positions are deterministic per ghost (hashed from index) so the scatter
+   is stable across renders of the same placement. */
 export function animateMarkGhosts(paths: SVGPathElement[]) {
   if (prefersReducedMotion()) return;
   const n = paths.length;
   if (n === 0) return;
   paths.forEach((el, i) => {
-    const t = n === 1 ? 0 : i / (n - 1);
-    const base = 0.92 - 0.82 * t;
+    // scatter around the placement point, polar so angles distribute evenly
+    const angle  = prand(i, 1) * Math.PI * 2;
+    const radius = 12 + prand(i, 2) * 44;           // 12 → 56 px from center
+    const tx = Math.cos(angle) * radius;
+    const ty = Math.sin(angle) * radius;
 
-    const rotation = -90 * t + jitter(i, 1, 18);
-    const scaleX   = base * (1 + jitter(i, 2, 0.28));
-    const scaleY   = base * (1 + jitter(i, 3, 0.28));
-    const rotateY  = 30 * Math.sin(t * Math.PI * 2) + jitter(i, 4, 18);
-    const rotateX  = -16 * Math.sin(t * Math.PI)    + jitter(i, 5, 14);
-    const tx       = jitter(i, 6, 6);
-    const ty       = jitter(i, 7, 6);
+    // varied particle size — some debris tiny, some chunky. axes independent
+    // so silhouettes look distinct rather than uniform.
+    const scaleX = 0.22 + prand(i, 3) * 0.7;        // 0.22 → 0.92
+    const scaleY = 0.22 + prand(i, 4) * 0.7;
 
-    const peak       = 0.42 + prand(i, 8) * 0.33;   // 0.42 → 0.75
-    const fadeInMs   = 40 + Math.round(prand(i, 9) * 30);
-    const fadeOutMs  = 110 + Math.round(prand(i, 10) * 90);
+    // each particle caught at its own rotation + 3D tilt
+    const rotate  = (prand(i, 5) - 0.5) * 220;      // ±110°
+    const rotateX = (prand(i, 6) - 0.5) * 90;       // ±45°
+    const rotateY = (prand(i, 7) - 0.5) * 90;
+
+    const peak      = 0.38 + prand(i, 8) * 0.4;     // 0.38 → 0.78
+    const fadeInMs  = 30 + Math.round(prand(i, 9) * 30);
+    const fadeOutMs = 110 + Math.round(prand(i, 10) * 140);
 
     utils.set(el, {
-      rotate: rotation,
-      scaleX, scaleY,
-      rotateX, rotateY,
       translateX: tx,
       translateY: ty,
+      scaleX, scaleY,
+      rotate, rotateX, rotateY,
       opacity: 0,
     });
     animate(el, {
@@ -114,7 +112,7 @@ export function animateMarkGhosts(paths: SVGPathElement[]) {
         { to: peak, duration: fadeInMs,  ease: 'outQuad' },
         { to: 0,    duration: fadeOutMs, ease: 'outQuad' },
       ],
-      delay: i * 38,
+      delay: i * 28,
     });
   });
 }

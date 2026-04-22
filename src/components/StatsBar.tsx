@@ -75,7 +75,9 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
           aria-label="reset history"
           title="Reset history"
         >
-          ×
+          <svg className="stats__reset-icon" viewBox="-6 -6 12 12" aria-hidden="true">
+            <path d="M -3 -3 L 3 3 M 3 -3 L -3 3" />
+          </svg>
         </button>
       )}
     </div>

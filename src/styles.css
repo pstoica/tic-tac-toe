@@ -167,8 +167,16 @@ button {
   margin-left: 2px;
   color: var(--ink-mute);
   transition: color 120ms ease, background 120ms ease, transform 120ms ease;
-  font-size: 14px;
-  line-height: 1;
+}
+
+.stats__reset-icon {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  display: block;
 }
 
 .stats__reset:hover {
