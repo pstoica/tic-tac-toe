@@ -86,7 +86,8 @@
 }
 
 /* turn indicator — pill in normal flow above the board. stays mounted when
-   the game ends so the board doesn't shift; .turn--hidden fades it out. */
+   the game ends so the board doesn't shift; fade-in/fade-out are both
+   driven through anime.js in Board's effects. */
 .turn {
   display: inline-flex;
   align-items: center;
@@ -102,7 +103,6 @@
   color: var(--ink);
   white-space: nowrap;
   box-shadow: 0 4px 0 oklch(6% 0.01 280 / 0.8);
-  transition: opacity 420ms ease;
 }
 
 .turn__token {
@@ -120,7 +120,6 @@
 }
 
 .turn--hidden {
-  opacity: 0;
   pointer-events: none;
 }
 

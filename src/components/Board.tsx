@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import {
   animateBoardIn,
   animateBoardOut,
+  animateTurnBadgeOut,
   dimNonWinningMarks,
   highlightWinningMarks,
 } from '../anim';
@@ -59,6 +60,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
       highlightWinningMarks(winning);
     }
     if (wrapRef.current) animateBoardOut(wrapRef.current);
+    if (turnBadgeRef.current) animateTurnBadgeOut(turnBadgeRef.current);
   }, [outcome]);
 
   return (

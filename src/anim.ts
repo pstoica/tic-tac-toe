@@ -127,6 +127,18 @@ export function animateBoardOut(wrapEl: HTMLElement) {
   });
 }
 
+export function animateTurnBadgeOut(el: HTMLElement) {
+  if (prefersReducedMotion()) {
+    el.style.opacity = '0';
+    return;
+  }
+  animate(el, {
+    opacity: [1, 0],
+    duration: 420,
+    ease: 'outQuad',
+  });
+}
+
 /* ---------- end-screen title reactions ---------- */
 
 export function animateWinTitle(chars: HTMLElement[]) {
