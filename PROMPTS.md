@@ -247,3 +247,16 @@ A running log of prompts supplied during this interview-project build.
 ## Prompt 36 — 2026-04-22
 
 > the W is cut off, assuming from trying to use mono character widths. consider tabular text or something making them all a tad wider to fit
+
+---
+
+## Prompt 37 — 2026-04-22
+
+> start going through these recommendations:
+>
+> B (split App.tsx) + D (remove Player.label) — cheap, cleans up the review-first file
+> C (constants file) — enables A and B to pull from one place
+> A2 (CSS modules) — largest refactor, saves for when structure is stable
+> F (tests) — adds confidence + signal
+> E (README) — last, reflecting the final state
+> G (ESLint) — only if time permits
