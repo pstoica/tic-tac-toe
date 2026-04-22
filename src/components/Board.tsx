@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   animateBoardIn,
   animateBoardOut,
@@ -34,6 +34,40 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
   const cellRefs = useRef<(SVGGElement | null)[]>([]);
   const gridRefs = useRef<(SVGLineElement | null)[]>([]);
   const markRefs = useRef<(SVGGElement | null)[]>([]);
+  const hitRefs = useRef<(SVGRectElement | null)[]>([]);
+
+  // roving tabindex — only one cell is in the tab order at a time; arrow keys
+  // move focus between the rendered hit rects, so Tab enters the grid once
+  // and the user navigates inside with arrow keys (ARIA grid pattern).
+  const [focusedCell, setFocusedCell] = useState<number>(4);
+  const firstEmpty = board.findIndex(c => c === null);
+  const tabbableCell = board[focusedCell] === null ? focusedCell : firstEmpty;
+
+  const moveFocus = (from: number, dir: 'up' | 'down' | 'left' | 'right') => {
+    let next = from;
+    for (let step = 0; step < 8; step++) {
+      switch (dir) {
+        case 'up':
+          next = (next + 6) % 9;
+          break;
+        case 'down':
+          next = (next + 3) % 9;
+          break;
+        case 'right':
+          next = next % 3 === 2 ? next - 2 : next + 1;
+          break;
+        case 'left':
+          next = next % 3 === 0 ? next + 2 : next - 1;
+          break;
+      }
+      const el = hitRefs.current[next];
+      if (el) {
+        setFocusedCell(next);
+        el.focus();
+        return;
+      }
+    }
+  };
 
   useLayoutEffect(() => {
     if (!turnBadgeRef.current) return;
@@ -127,18 +161,34 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               {!disabled && (
                 <rect
                   className={styles.cellHit}
+                  ref={el => {
+                    hitRefs.current[i] = el;
+                  }}
                   x={x}
                   y={y}
                   width={CELL}
                   height={CELL}
                   role="gridcell"
                   aria-label={`cell ${i + 1}, empty, place ${current}`}
-                  tabIndex={0}
+                  tabIndex={tabbableCell === i ? 0 : -1}
+                  onFocus={() => setFocusedCell(i)}
                   onClick={() => onCellClick(i)}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       onCellClick(i);
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      moveFocus(i, 'up');
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      moveFocus(i, 'down');
+                    } else if (e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      moveFocus(i, 'left');
+                    } else if (e.key === 'ArrowRight') {
+                      e.preventDefault();
+                      moveFocus(i, 'right');
                     }
                   }}
                 />

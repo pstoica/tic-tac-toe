@@ -47,6 +47,16 @@ export function DifficultyPicker({
     onConfirm(value);
   };
 
+  const onOptionKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, i: number) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      optionRefs.current[(i + 1) % OPTIONS.length]?.focus();
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      optionRefs.current[(i - 1 + OPTIONS.length) % OPTIONS.length]?.focus();
+    }
+  };
+
   return (
     <div className={styles.picker} ref={cardRef}>
       <h2 className={styles.pickerTitle}>{title}</h2>
@@ -60,6 +70,7 @@ export function DifficultyPicker({
             type="button"
             className={styles.optCard}
             onClick={() => onSelect(opt.value)}
+            onKeyDown={e => onOptionKeyDown(e, i)}
             hue={opt.hue}
           >
             <span className={styles.optCardName}>{opt.name}</span>
