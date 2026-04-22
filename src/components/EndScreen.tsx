@@ -52,12 +52,7 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
   if (showPicker) {
     return (
       <div className={styles.end} role="dialog" aria-modal="true" aria-label="choose next opponent">
-        <DifficultyPicker
-          initial={difficulty}
-          title="Pick your next opponent"
-          ctaLabel="Play again"
-          onConfirm={onReplay}
-        />
+        <DifficultyPicker title="Pick your next opponent" onConfirm={onReplay} />
       </div>
     );
   }

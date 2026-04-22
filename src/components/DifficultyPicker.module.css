@@ -1,4 +1,4 @@
-/* hand-placed cards with stars and wonky tilt */
+/* cards-as-buttons: each one always lives in its own hue, no separate CTA */
 
 .picker {
   width: 100%;
@@ -16,7 +16,7 @@
 
 .picker__options {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   /* room for the tilted cards to breathe without being clipped */
   padding: 6px 4px;
 }
@@ -31,61 +31,50 @@
   gap: 14px;
   padding: 18px 22px;
   border-radius: 14px;
-  background: oklch(22% 0.04 285);
-  border: 2px solid oklch(30% 0.04 285);
+  border: 0;
+  background: oklch(62% 0.2 var(--accent-hue));
+  color: oklch(14% 0.05 var(--accent-hue));
+  /* matches the chunky Button: solid drop + ambient + inset top highlight.
+     no outer ring at rest — hover brings a subtle rim in. */
   box-shadow:
-    0 5px 0 oklch(10% 0.02 285),
-    0 12px 18px -8px oklch(0% 0 0 / 0.5);
+    0 6px 0 oklch(36% 0.14 var(--accent-hue)),
+    0 14px 24px oklch(0% 0 0 / 0.45),
+    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.55);
   text-align: left;
   transform: rotate(var(--tilt));
   transition:
-    transform 160ms cubic-bezier(0.3, 1.4, 0.5, 1),
-    border-color 140ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
+    transform 90ms ease,
+    box-shadow 120ms ease,
+    filter 160ms ease;
+  user-select: none;
+  cursor: pointer;
 }
 
-/* unselected, un-hovered cards rock gently around their base tilt — the
-   animation-delay is set inline per card so they're out of phase. the
-   :not chain makes sure :hover and :selected take over without fighting. */
-.opt-card:not(.opt-card--selected):not(:hover) {
-  animation: cardIdleRock 4800ms ease-in-out infinite;
-}
-
-@keyframes cardIdleRock {
-  0%,
-  100% {
-    transform: rotate(var(--tilt));
-  }
-  50% {
-    transform: rotate(calc(var(--tilt) * 1.18));
-  }
-}
-
-/* rotate exaggerates (hit area stays roughly the same since rotation is around
-   the card's center); no translateY since the bottom solid shadow would
-   otherwise sit in a dead zone between original and hover positions */
-.opt-card:hover:not(.opt-card--selected) {
-  transform: rotate(calc(var(--tilt) * 1.6));
-  border-color: oklch(78% 0.16 var(--accent-hue));
+/* exaggerate the wonky tilt + a brightness nudge + inset rim so the edge
+   actually reads as "interactive" instead of just a tilt shift */
+.opt-card:hover {
+  transform: rotate(calc(var(--tilt) * 1.5));
+  filter: brightness(1.05);
+  box-shadow:
+    0 6px 0 oklch(36% 0.14 var(--accent-hue)),
+    0 14px 24px oklch(0% 0 0 / 0.45),
+    inset 0 0 0 2px oklch(94% 0.12 var(--accent-hue) / 0.85),
+    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.6);
 }
 
 .opt-card:focus-visible {
-  outline: none;
-  border-color: oklch(88% 0.15 var(--accent-hue));
-  box-shadow:
-    0 5px 0 oklch(10% 0.02 285),
-    0 0 0 3px oklch(88% 0.15 var(--accent-hue) / 0.4);
+  outline: 3px solid oklch(92% 0.15 var(--accent-hue));
+  outline-offset: 3px;
 }
 
-.opt-card--selected {
-  transform: rotate(0deg) translateY(-3px) scale(1.02);
-  background: oklch(58% 0.21 var(--accent-hue));
-  border-color: oklch(90% 0.15 var(--accent-hue));
-  color: oklch(12% 0.04 var(--accent-hue));
+/* press feedback — slide into the bottom shadow like the chunky Button.
+   hit area moves INTO where the cursor already is, so no flicker. */
+.opt-card:active {
+  transform: rotate(var(--tilt)) translateY(4px);
   box-shadow:
-    0 7px 0 oklch(30% 0.14 var(--accent-hue)),
-    0 0 26px oklch(80% 0.18 var(--accent-hue) / 0.55);
+    0 2px 0 oklch(36% 0.14 var(--accent-hue)),
+    0 6px 10px oklch(0% 0 0 / 0.35),
+    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.4);
 }
 
 .opt-card__name {
@@ -103,49 +92,14 @@
 }
 
 .opt-card__star {
-  color: oklch(35% 0.03 285);
-  transition:
-    color 160ms ease,
-    text-shadow 160ms ease;
+  line-height: 1;
 }
 
 .opt-card__star--on {
-  color: oklch(85% 0.18 var(--accent-hue));
-  text-shadow: 0 0 10px oklch(85% 0.18 var(--accent-hue) / 0.65);
-}
-
-.opt-card--selected .opt-card__star--off {
-  color: oklch(35% 0.1 var(--accent-hue) / 0.6);
-}
-
-.opt-card--selected .opt-card__star--on {
   color: oklch(98% 0.08 var(--accent-hue));
-  text-shadow: 0 0 14px oklch(98% 0.08 var(--accent-hue) / 0.95);
-  animation: starTwinkle 1800ms ease-in-out infinite;
+  text-shadow: 0 0 12px oklch(98% 0.08 var(--accent-hue) / 0.9);
 }
 
-.opt-card--selected .opt-card__star--on:nth-child(2) {
-  animation-delay: 220ms;
-}
-.opt-card--selected .opt-card__star--on:nth-child(3) {
-  animation-delay: 440ms;
-}
-
-@keyframes starTwinkle {
-  0%,
-  100% {
-    transform: scale(1);
-    text-shadow: 0 0 14px oklch(98% 0.08 var(--accent-hue) / 0.95);
-  }
-  50% {
-    transform: scale(1.22);
-    text-shadow: 0 0 22px oklch(98% 0.12 var(--accent-hue));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .opt-card:not(.opt-card--selected):not(:hover),
-  .opt-card--selected .opt-card__star--on {
-    animation: none;
-  }
+.opt-card__star--off {
+  color: oklch(35% 0.1 var(--accent-hue) / 0.55);
 }

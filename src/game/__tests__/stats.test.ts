@@ -33,7 +33,7 @@ beforeEach(() => {
 
 const record = (result: GameRecord['result'], i = 0): GameRecord => ({
   result,
-  difficulty: 'smart',
+  difficulty: 'medium',
   at: `2026-04-22T00:00:${String(i).padStart(2, '0')}.000Z`,
 });
 

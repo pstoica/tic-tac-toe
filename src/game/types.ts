@@ -11,6 +11,6 @@ export type Outcome =
   | { kind: 'draw' }
   | { kind: 'win'; winner: Mark; line: WinLine };
 
-export type Difficulty = 'easy' | 'smart' | 'perfect';
+export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export type PlayerKind = 'human' | 'cpu';

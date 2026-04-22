@@ -77,9 +77,9 @@ function pickByDifficulty(board: Board, mark: Mark, difficulty: Difficulty): num
   switch (difficulty) {
     case 'easy':
       return randomMove(board);
-    case 'smart':
+    case 'medium':
       return Math.random() < 0.18 ? randomMove(board) : bestMove(board, mark);
-    case 'perfect':
+    case 'hard':
       return bestMove(board, mark);
   }
 }
