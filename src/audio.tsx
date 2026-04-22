@@ -54,10 +54,8 @@ function SoundsInner({ children }: { children: ReactNode }) {
       lose: () => {
         if (patch.ready) patch.play('error');
       },
-      // 'info' — neutral informational tone, reads as "noted" rather than
-      // good or bad, which fits a draw better than success/error/notification
       draw: () => {
-        if (patch.ready) patch.play('info');
+        if (patch.ready) patch.play('delete');
       },
     }),
     [patch],

@@ -16,7 +16,13 @@ interface GameSessionProps {
 
 export function GameSession({ difficulty, onFinish, onCalculating }: GameSessionProps) {
   const [board, setBoard] = useState<BoardType>(EMPTY_BOARD);
-  const [current, setCurrent] = useState<Mark>(HUMAN_MARK);
+  // coin flip on who starts — with perfect play tic-tac-toe is a forced draw
+  // either way, but X has a real edge against imperfect opponents (more moves,
+  // sets the rhythm), so letting the CPU go first sometimes keeps Easy/Medium
+  // from feeling one-sided.
+  const [current, setCurrent] = useState<Mark>(() =>
+    Math.random() < 0.5 ? HUMAN_MARK : CPU_MARK,
+  );
   const sounds = useGameSounds();
 
   const players = useMemo<Record<Mark, Player>>(
