@@ -142,6 +142,9 @@ button {
   align-items: center;
   gap: 14px;
   padding: 6px 12px;
+  /* reserve the reset button's height so the pill doesn't reflow when the
+     button appears/disappears */
+  min-height: 32px;
   background: oklch(16% 0.03 285 / 0.7);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -198,6 +201,7 @@ button {
 .stats__confirm-btns {
   display: inline-flex;
   gap: 6px;
+  margin-right: -4px;
 }
 
 .stats__confirm-btn {
@@ -214,14 +218,14 @@ button {
   color: oklch(14% 0.04 25);
 }
 
-.stats__confirm-btn--yes:hover { transform: translateY(-1px); background: oklch(70% 0.19 25); }
+.stats__confirm-btn--yes:hover { background: oklch(70% 0.19 25); }
 
 .stats__confirm-btn--no {
   background: oklch(22% 0.03 285);
   color: var(--ink-dim);
 }
 
-.stats__confirm-btn--no:hover { transform: translateY(-1px); color: var(--ink); }
+.stats__confirm-btn--no:hover { color: var(--ink); background: oklch(28% 0.04 285); }
 
 .stats__group {
   display: inline-flex;
@@ -264,7 +268,7 @@ button {
 
 .stats__token--win  { color: oklch(86% 0.16 145); }
 .stats__token--loss { color: oklch(82% 0.18 25); }
-.stats__token--draw { color: var(--ink-mute); }
+.stats__token--draw { color: var(--ink-dim); }
 
 /* ============================================================
    board
@@ -301,7 +305,7 @@ button {
 
 .board__grid-line {
   stroke: var(--border);
-  stroke-width: 2;
+  stroke-width: 1.25;
   stroke-linecap: round;
   opacity: 0;
 }
@@ -309,7 +313,7 @@ button {
 .cell-bg {
   fill: oklch(18% 0.025 285 / 0.55);
   stroke: oklch(40% 0.03 285 / 0.55);
-  stroke-width: 1.5;
+  stroke-width: 0.9;
   transition: fill 180ms ease, stroke 180ms ease;
 }
 
@@ -335,6 +339,13 @@ button {
 
 .mark {
   pointer-events: none;
+}
+
+/* the cell-wrapping <g> gets scaled by the winning-line highlight, so it
+   needs its own fill-box origin — otherwise the scale falls back to the
+   SVG (0, 0) origin and the mark reads as sliding toward the corner. */
+.mark-cell,
+.mark-primary {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -380,9 +391,9 @@ button {
 .win-slash {
   fill: none;
   stroke: var(--win-color);
-  stroke-width: 10;
+  stroke-width: 6;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 16px oklch(88% 0.18 145 / 0.7));
+  filter: drop-shadow(0 0 14px oklch(88% 0.18 145 / 0.65));
 }
 
 /* turn indicator — pill in normal flow above the board */
@@ -414,7 +425,7 @@ button {
   color: oklch(16% 0.06 var(--turn-hue, 25));
   box-shadow: 0 0 12px oklch(86% 0.18 var(--turn-hue, 25) / 0.55);
   /* optically nest with the pill's left curve instead of floating inside it */
-  margin-left: -7px;
+  margin-left: -10px;
 }
 
 .turn--hidden {
@@ -481,9 +492,12 @@ button {
   user-select: none;
 }
 
+/* no translateY on hover — the 6px bottom shadow isn't part of the hit area,
+   so moving the button up flips the cursor off the button edge and causes
+   flicker. brightness change alone is enough for hover feedback. */
 .btn:hover {
-  transform: translateY(-1px);
-  background: oklch(68% 0.2 var(--btn-hue));
+  background: oklch(70% 0.21 var(--btn-hue));
+  filter: brightness(1.04);
 }
 
 .btn:active {
@@ -510,7 +524,7 @@ button {
 }
 
 .btn--ghost:hover {
-  background: oklch(22% 0.04 285);
+  background: oklch(24% 0.05 285);
   color: var(--ink);
 }
 
@@ -566,8 +580,11 @@ button {
   transition: transform 160ms cubic-bezier(.3, 1.4, .5, 1), border-color 140ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
+/* rotate exaggerates (hit area stays roughly the same since rotation is around
+   the card's center); no translateY since the bottom solid shadow would
+   otherwise sit in a dead zone between original and hover positions */
 .opt-card:hover:not(.opt-card--selected) {
-  transform: rotate(calc(var(--tilt) * 1.6)) translateY(-2px);
+  transform: rotate(calc(var(--tilt) * 1.6));
   border-color: oklch(78% 0.16 var(--accent-hue));
 }
 

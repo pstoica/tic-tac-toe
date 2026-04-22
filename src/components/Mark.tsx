@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
-import { animateMarkGhosts, animateMarkGrow } from '../anim';
+import { animateMarkGhosts, animateMarkGrow, GHOST_COUNT } from '../anim';
 import type { Mark as MarkType } from '../game/types';
 
 interface MarkProps {
@@ -18,7 +18,6 @@ const MARK_PATH = (mark: MarkType, cx: number, cy: number, s: number): string =>
   return `M ${cx - h} ${cy - h} L ${cx + h} ${cy + h} M ${cx + h} ${cy - h} L ${cx - h} ${cy + h}`;
 };
 
-const GHOST_COUNT = 12;
 
 export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
   const groupRef = useRef<SVGGElement>(null);
@@ -33,7 +32,7 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
   const d = MARK_PATH(mark, cx, cy, size);
 
   return (
-    <g ref={groupRef} className={`mark mark--${mark}`}>
+    <g className={`mark mark--${mark}`}>
       <g className="mark-ghosts">
         {Array.from({ length: GHOST_COUNT }, (_, i) => (
           <path
@@ -45,7 +44,11 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
           />
         ))}
       </g>
-      <path className="mark__path" d={d} />
+      {/* only the primary shape receives the grow animation — scaling the
+          outer group would also scale the ghosts past the clip boundary */}
+      <g ref={groupRef} className="mark-primary">
+        <path className="mark__path" d={d} />
+      </g>
     </g>
   );
 }

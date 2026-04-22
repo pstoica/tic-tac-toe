@@ -84,20 +84,6 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         )}
       </div>
       <svg className="board" viewBox={`0 0 ${VIEW} ${VIEW}`} role="grid" aria-label="tic tac toe board">
-        {/* per-cell clipPaths so the particle scatter is hard-bounded to the
-            placed cell regardless of render size */}
-        <defs>
-          {Array.from({ length: 9 }, (_, i) => {
-            const x = (i % 3) * CELL;
-            const y = Math.floor(i / 3) * CELL;
-            return (
-              <clipPath key={i} id={`cell-clip-${i}`}>
-                <rect x={x} y={y} width={CELL} height={CELL} />
-              </clipPath>
-            );
-          })}
-        </defs>
-
         {/* cells */}
         {Array.from({ length: 9 }, (_, i) => {
           const x = (i % 3) * CELL;
@@ -141,24 +127,36 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
           );
         })}
 
-        {/* grid lines */}
-        <line ref={el => { gridRefs.current[0] = el; }} className="board__grid-line" x1={CELL} y1={10} x2={CELL} y2={VIEW - 10} />
-        <line ref={el => { gridRefs.current[1] = el; }} className="board__grid-line" x1={CELL * 2} y1={10} x2={CELL * 2} y2={VIEW - 10} />
-        <line ref={el => { gridRefs.current[2] = el; }} className="board__grid-line" x1={10} y1={CELL} x2={VIEW - 10} y2={CELL} />
-        <line ref={el => { gridRefs.current[3] = el; }} className="board__grid-line" x1={10} y1={CELL * 2} x2={VIEW - 10} y2={CELL * 2} />
+        {/* grid lines — full span of the viewBox */}
+        <line ref={el => { gridRefs.current[0] = el; }} className="board__grid-line" x1={CELL} y1={0} x2={CELL} y2={VIEW} />
+        <line ref={el => { gridRefs.current[1] = el; }} className="board__grid-line" x1={CELL * 2} y1={0} x2={CELL * 2} y2={VIEW} />
+        <line ref={el => { gridRefs.current[2] = el; }} className="board__grid-line" x1={0} y1={CELL} x2={VIEW} y2={CELL} />
+        <line ref={el => { gridRefs.current[3] = el; }} className="board__grid-line" x1={0} y1={CELL * 2} x2={VIEW} y2={CELL * 2} />
 
-        {/* marks */}
+        {/* marks — each wrapped in its own nested <svg> with overflow:hidden
+            so its viewport clips anything outside the tile (ghost particle
+            trails). the mark is positioned at the center of the inner
+            viewport, not in board-level coordinates. */}
         {board.map((cell, i) => {
           if (!cell) return null;
-          const { cx, cy } = cellCenter(i);
+          const x = (i % 3) * CELL;
+          const y = Math.floor(i / 3) * CELL;
+          const inner = CELL - 12;
+          const center = inner / 2;
           return (
-            <g
+            <svg
               key={`mark-${i}-${cell}`}
-              ref={el => { markRefs.current[i] = el; }}
-              clipPath={`url(#cell-clip-${i})`}
+              x={x + 6}
+              y={y + 6}
+              width={inner}
+              height={inner}
+              viewBox={`0 0 ${inner} ${inner}`}
+              style={{ overflow: 'hidden' }}
             >
-              <Mark mark={cell} cx={cx} cy={cy} size={52} />
-            </g>
+              <g ref={el => { markRefs.current[i] = el; }} className="mark-cell">
+                <Mark mark={cell} cx={center} cy={center} size={52} />
+              </g>
+            </svg>
           );
         })}
 

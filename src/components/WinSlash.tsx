@@ -16,8 +16,9 @@ export function WinSlash({ x1, y1, x2, y2 }: WinSlashProps) {
     if (a.current && b.current) animateWinSlash(a.current, b.current);
   }, []);
 
-  // extend slightly past the cell centers so the line frames the marks
-  const extend = 18;
+  // extend past the cell centers so the slash reaches beyond the mark edges
+  // (mark half-width is ~26; 36 pushes the line ~10 past the marks on each end)
+  const extend = 36;
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.hypot(dx, dy);

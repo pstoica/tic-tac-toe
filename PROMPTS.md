@@ -145,3 +145,75 @@ A running log of prompts supplied during this interview-project build.
 ## Prompt 19 — 2026-04-22
 
 > /btw we should do a smaller gap between the Yes/No buttons
+
+---
+
+## Prompt 20 — 2026-04-22
+
+> i think the ghosts are all too close to the center though, it can be more randomly placed throughout the box since we clip it
+
+---
+
+## Prompt 21 — 2026-04-22
+
+> its not properly clipped to the box, are we scaling ALL nodes when placing down and not just the primary shape?
+
+---
+
+## Prompt 22 — 2026-04-22
+
+> i want to clip it within THIS box, the copies are still able to render outside
+
+---
+
+## Prompt 23 — 2026-04-22
+
+> can you not use overflow: hidden?
+
+---
+
+## Prompt 24 — 2026-04-22
+
+> i really hate the animation on the shapes when 3 are lined. it looks like they all scale towards bottom right, instead of anchoring to the center.
+
+---
+
+## Prompt 25 — 2026-04-22
+
+> this reset button changes the height when it's visible/invisible, the other text has shorter boxes
+
+---
+
+## Prompt 26 — 2026-04-22
+
+> for the board lines, can we do 0 to 300 instead of 10 to 290, and reduce the stroke widths for the lines and boxes
+
+---
+
+## Prompt 27 — 2026-04-22
+
+> i think the green winning dash is a bit thick and could go a bit wider than the shapes?
+
+---
+
+## Prompt 28 — 2026-04-22
+
+> these button hover states are problematic since the bottom shadow isnt interactive and we're animating the offset
+
+---
+
+## Prompt 29 — 2026-04-22
+
+> make the number of ghosts a var i can adjust
+
+---
+
+## Prompt 30 — 2026-04-22
+
+> can we just make a random function with a min.max to make it easier to try diff ranges?
+
+---
+
+## Prompt 31 — 2026-04-22
+
+> feels pretty good. anything we should standardize before submitting? more modular CSS approach so its not in one file, refactoring anything else? do an architectural review and write an outline? commit before continuing.

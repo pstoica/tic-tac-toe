@@ -1,6 +1,13 @@
 import { animate, stagger, utils } from 'animejs';
 
 /* ============================================================
+   tweakables — bump these while iterating on the feel
+   ============================================================ */
+
+// how many ghost particles burst from each placed mark
+export const GHOST_COUNT = 20;
+
+/* ============================================================
    helpers
    ============================================================ */
 
@@ -11,6 +18,10 @@ const prefersReducedMotion = (): boolean =>
 function pathLength(el: SVGGeometryElement): number {
   try { return el.getTotalLength(); } catch { return 100; }
 }
+
+// uniform random in [min, max] — makes the ghost params read as ranges
+const rand  = (min: number, max: number): number => min + Math.random() * (max - min);
+const irand = (min: number, max: number): number => Math.round(rand(min, max));
 
 /* ============================================================
    board entrance — staggered, from center, with spectrum sweep
@@ -74,21 +85,21 @@ export function animateMarkGhosts(paths: SVGPathElement[]) {
   const n = paths.length;
   if (n === 0) return;
   paths.forEach((el, i) => {
-    const angle  = Math.random() * Math.PI * 2;
-    const radius = 2 + Math.random() * 15;           // 2 → 17 from center
-    const tx = Math.cos(angle) * radius;
-    const ty = Math.sin(angle) * radius;
+    // rectangular distribution fills the cell uniformly (polar clusters at
+    // the center). overflow:hidden on the nested <svg> catches any spill.
+    const tx = rand(-40, 40);
+    const ty = rand(-40, 40);
 
-    const scaleX = 0.12 + Math.random() * 0.32;      // 0.12 → 0.44
-    const scaleY = 0.12 + Math.random() * 0.32;
+    const scaleX = rand(0.1, 0.6);
+    const scaleY = rand(0.1, 0.6);
 
-    const rotate  = (Math.random() - 0.5) * 260;     // ±130°
-    const rotateX = (Math.random() - 0.5) * 100;     // ±50°
-    const rotateY = (Math.random() - 0.5) * 100;
+    const rotate  = rand(-180, 180);
+    const rotateX = rand(-90, 90);
+    const rotateY = rand(-90, 90);
 
-    const peak      = 0.32 + Math.random() * 0.48;   // 0.32 → 0.80
-    const fadeInMs  = 28 + Math.round(Math.random() * 42);
-    const fadeOutMs = 90  + Math.round(Math.random() * 160);
+    const peak      = rand(0.1, 1);
+    const fadeInMs  = irand(28, 70);
+    const fadeOutMs = irand(200, 450);
 
     utils.set(el, {
       translateX: tx,
