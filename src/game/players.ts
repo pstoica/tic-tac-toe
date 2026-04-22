@@ -38,10 +38,6 @@ export class HumanPlayer implements Player {
     r(index);
     return true;
   }
-
-  get isWaiting(): boolean {
-    return this.pending !== null;
-  }
 }
 
 export class CpuPlayer implements Player {

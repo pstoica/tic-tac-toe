@@ -40,13 +40,10 @@ export function DifficultyPicker({
 
   const onSelect = async (value: Difficulty) => {
     if (!cardRef.current) return;
-    // first user gesture — browsers require this before any AudioContext
-    // can actually produce sound. fire and forget; the play below will
-    // silently no-op if the context isn't ready yet.
+    // first user gesture — unlocks the AudioContext for the rest of the session
     ensureReady();
     sounds.button();
-    const opts = optionRefs.current.filter((o): o is HTMLButtonElement => !!o);
-    await animatePickerOut(cardRef.current, opts);
+    await animatePickerOut(cardRef.current);
     onConfirm(value);
   };
 

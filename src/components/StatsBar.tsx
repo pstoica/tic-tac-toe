@@ -97,14 +97,10 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
   );
 }
 
-/* ----------------------------------------------------------
-   StatsStrip
-   Fixed-width overflow container; simple virtualization.
-   The inner row holds the full set of tokens and shifts left
-   by one slot when the cap is hit, so the oldest slides out
-   the left edge while the new one slides in from the right —
-   each with a straight fade. Pre-cap adds just fade in place.
-   --------------------------------------------------------- */
+/* Fixed-width overflow container. Once the cap is hit, the inner row shifts
+   left by one slot (translateX) so the oldest token exits through the left
+   edge while the new one enters from the right, each with its own fade.
+   Pre-cap adds just fade in place. */
 
 interface StatsStripProps {
   recent: GameRecord[];
@@ -134,19 +130,14 @@ function StatsStrip({ recent }: StatsStripProps) {
     const oldEntry = prev.find(p => !recentAt.has(p.at));
 
     if (!newEntry) {
-      // reset, or some other backfill — snap to whatever recent is now
+      // reset or other backfill — snap to whatever recent is now
       setDisplayed(recent);
       return;
     }
 
-    if (oldEntry) {
-      // keep the outgoing token in the DOM (at slot 0) while it slides out.
-      // the row's own translateX handles the virtualization scroll; the
-      // container clips anything past its edges.
-      setDisplayed([oldEntry, ...recent]);
-    } else {
-      setDisplayed(recent);
-    }
+    // keep the outgoing token at slot 0 while it slides out; the container's
+    // overflow clips anything past its edges
+    setDisplayed(oldEntry ? [oldEntry, ...recent] : recent);
 
     const frame = requestAnimationFrame(() => {
       const row = rowRef.current;
@@ -154,18 +145,17 @@ function StatsStrip({ recent }: StatsStripProps) {
       const oldEl = oldEntry ? elRefs.current.get(oldEntry.at) : null;
 
       if (oldEntry && row && oldEl && newEl) {
-        // parallel: row scrolls one slot left, old fades out as it exits
-        // the left edge, new fades in as it enters from the right edge
+        // row scrolls one slot left while old fades out the left edge and
+        // new fades in from the right
         utils.set(row, { translateX: 0 });
         animate(row, {
           translateX: [0, -TOKEN_STEP],
           duration: DURATION,
           ease: EASE,
           onComplete: () => {
-            // flushSync the content swap *before* unwinding the translate,
-            // so in a single paint the row has 12 items AND translateX: 0.
-            // otherwise there's one frame where translateX = 0 but 13
-            // items are still in the DOM and the 13th clips past the edge.
+            // flushSync so the 12-item state commits in the same paint as
+            // resetting translateX — otherwise one frame shows 13 items at
+            // translateX: 0 and the trailing token clips past the edge.
             flushSync(() => {
               setDisplayed(recent);
             });

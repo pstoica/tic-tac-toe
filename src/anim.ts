@@ -1,29 +1,22 @@
 import { animate, stagger, utils } from 'animejs';
 
-/* ============================================================
-   tweakables — bump these while iterating on the feel
-   ============================================================ */
-
-// how many ghost particles burst from each placed mark
 export const GHOST_COUNT = 20;
-
-/* ============================================================
-   helpers
-   ============================================================ */
 
 const prefersReducedMotion = (): boolean =>
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 
-// uniform random in [min, max] — makes the ghost params read as ranges
+// uniform random in [min, max] — keeps the ghost params read as ranges
 const rand = (min: number, max: number): number => min + Math.random() * (max - min);
 const irand = (min: number, max: number): number => Math.round(rand(min, max));
 
-/* ============================================================
-   board entrance — staggered, from center, with spectrum sweep
-   ============================================================ */
+/* ---------- board entrance ---------- */
 
-export function animateBoardIn(turnBadge: HTMLDivElement, cellEls: SVGGElement[], gridLineEls: SVGLineElement[]) {
+export function animateBoardIn(
+  turnBadge: HTMLDivElement,
+  cellEls: SVGGElement[],
+  gridLineEls: SVGLineElement[],
+) {
   if (prefersReducedMotion()) {
     turnBadge.style.opacity = '1';
     cellEls.forEach(el => {
@@ -39,10 +32,7 @@ export function animateBoardIn(turnBadge: HTMLDivElement, cellEls: SVGGElement[]
   utils.set(cellEls, { opacity: 0, scale: 0.55, rotate: -10 });
   utils.set(gridLineEls, { opacity: 0 });
 
-  animate(turnBadge, {
-    opacity: [0, 1],
-    delay: 500,
-  });
+  animate(turnBadge, { opacity: [0, 1], delay: 500 });
 
   animate(cellEls, {
     opacity: [0, 1],
@@ -61,10 +51,7 @@ export function animateBoardIn(turnBadge: HTMLDivElement, cellEls: SVGGElement[]
   });
 }
 
-/* ============================================================
-   mark pop-in — the main mark snaps in via a scale pop on the group.
-   no stroke-dash trace; the ghost trail is the flourish.
-   ============================================================ */
+/* ---------- mark placement ---------- */
 
 export function animateMarkGrow(groupEl: SVGGElement) {
   if (prefersReducedMotion()) return;
@@ -78,61 +65,36 @@ export function animateMarkGrow(groupEl: SVGGElement) {
   });
 }
 
-/* collision-particle burst on placement: each ghost is a static, independent
-   snapshot — small debris scattered at a random radial offset inside the
-   cell, at its own scaleX/Y, rotation, and 3D tilt — and only opacity
-   animates.
-
-   parameters are fully re-rolled on every placement (Math.random rather
-   than hashed-from-index) so two X's never produce the same scatter.
-   values are clamped small enough to stay inside the cell even at small
-   renders; the <clipPath> in Board.tsx is the hard backstop. */
+/* Each ghost is a frozen debris snapshot: random position inside the cell +
+   scale / rotation / 3D tilt, fully re-rolled per placement so no two marks
+   produce the same scatter. Only opacity animates. The nested <svg> in
+   Board.tsx has overflow:hidden to catch any spill past the cell edge. */
 export function animateMarkGhosts(paths: SVGPathElement[]) {
   if (prefersReducedMotion()) return;
-  const n = paths.length;
-  if (n === 0) return;
+  if (paths.length === 0) return;
   paths.forEach((el, i) => {
-    // rectangular distribution fills the cell uniformly (polar clusters at
-    // the center). overflow:hidden on the nested <svg> catches any spill.
-    const tx = rand(-40, 40);
-    const ty = rand(-40, 40);
-
-    const scaleX = rand(0.1, 0.6);
-    const scaleY = rand(0.1, 0.6);
-
-    const rotate = rand(-180, 180);
-    const rotateX = rand(-90, 90);
-    const rotateY = rand(-90, 90);
-
-    const peak = rand(0.1, 1);
-    const fadeInMs = irand(28, 70);
-    const fadeOutMs = irand(200, 450);
-
     utils.set(el, {
-      translateX: tx,
-      translateY: ty,
-      scaleX,
-      scaleY,
-      rotate,
-      rotateX,
-      rotateY,
+      translateX: rand(-40, 40),
+      translateY: rand(-40, 40),
+      scaleX: rand(0.1, 0.6),
+      scaleY: rand(0.1, 0.6),
+      rotate: rand(-180, 180),
+      rotateX: rand(-90, 90),
+      rotateY: rand(-90, 90),
       opacity: 0,
     });
     animate(el, {
       opacity: [
-        { to: peak, duration: fadeInMs, ease: 'outQuad' },
-        { to: 0, duration: fadeOutMs, ease: 'outQuad' },
+        { to: rand(0.1, 1), duration: irand(28, 70), ease: 'outQuad' },
+        { to: 0, duration: irand(200, 450), ease: 'outQuad' },
       ],
       delay: i * 28,
     });
   });
 }
 
-/* ============================================================
-   end-of-game mark emphasis
-   ============================================================ */
+/* ---------- end-of-game ---------- */
 
-/* dim the non-winning marks so the winning trio reads as the focal point */
 export function dimNonWinningMarks(marks: SVGGElement[]) {
   if (prefersReducedMotion()) return;
   animate(marks, {
@@ -152,10 +114,8 @@ export function highlightWinningMarks(marks: SVGGElement[]) {
   });
 }
 
-/* fade the board wrapper down before the EndScreen takes over — the
-   GameSession waits 1300ms after the last move before firing onFinish,
-   so starting this at ~850ms lines the fade-out up with EndScreen's
-   fade-in for a real crossfade instead of a hard swap. */
+/* Starts at ~850ms so the wrap fade finishes right as GameSession's 1300ms
+   onFinish fires and EndScreen mounts — crossfade instead of a hard swap. */
 export function animateBoardOut(wrapEl: HTMLElement) {
   if (prefersReducedMotion()) return;
   animate(wrapEl, {
@@ -167,13 +127,10 @@ export function animateBoardOut(wrapEl: HTMLElement) {
   });
 }
 
-/* ============================================================
-   end screen — mario-style title reactions
-   ============================================================ */
+/* ---------- end-screen title reactions ---------- */
 
 export function animateWinTitle(chars: HTMLElement[]) {
   if (prefersReducedMotion()) return () => {};
-  // each char gets a hue offset for a rainbow wash
   chars.forEach((c, i) => {
     c.style.setProperty('--char-hue', String(120 + ((i * 22) % 220)));
   });
@@ -193,14 +150,14 @@ export function animateWinTitle(chars: HTMLElement[]) {
   return () => a.pause();
 }
 
+/* Alternating-sign vertical jitter per letter so the word looks unsteady —
+   wonky, not just shaking. Rotate/translate amplitudes vary per letter too. */
 export function animateLossTitle(chars: HTMLElement[]) {
   if (prefersReducedMotion()) return () => {};
-  // each letter gets alternating-sign vertical jitter so the whole word looks
-  // unsteady — wonky, not just shaking. rotate amplitude varies per letter too.
   const animations = chars.map((el, i) => {
     const sign = i % 2 === 0 ? 1 : -1;
-    const rotAmp = 5 + (i % 3) * 2; // 5, 7, 9 rotated degrees
-    const yAmp = 6 + (i % 2) * 2; // 6 or 8 px vertical
+    const rotAmp = 5 + (i % 3) * 2;
+    const yAmp = 6 + (i % 2) * 2;
     return animate(el, {
       translateY: [
         { to: -yAmp * sign, duration: 85, ease: 'outQuad' },
@@ -256,9 +213,18 @@ export function animateEndCardIn(cardEl: HTMLElement) {
   });
 }
 
-/* ============================================================
-   brand — per-letter hue wave on solid colors (no gradient)
-   ============================================================ */
+export function animateEndCardOut(cardEl: HTMLElement) {
+  if (prefersReducedMotion()) return;
+  return animate(cardEl, {
+    opacity: [1, 0],
+    scale: [1, 0.95],
+    translateY: [0, -8],
+    duration: 240,
+    ease: 'inQuad',
+  });
+}
+
+/* ---------- brand wordmark ---------- */
 
 export function animateBrandHues(containerEl: HTMLElement) {
   if (prefersReducedMotion()) return () => {};
@@ -277,20 +243,19 @@ export function animateBrandHues(containerEl: HTMLElement) {
   return () => animations.forEach(a => a.pause());
 }
 
-/* "calculating" flicker — each letter gets a fresh random hue on every tick
-   so the wordmark reads as processing rather than a coherent spectrum shift.
-   self-rescheduling setTimeout with an attack/release envelope on the tick
-   interval: ramps up fast for the first ~140ms (attack), then winds down
-   with an ease-in quad so the flicker gradually settles into a slow pulse
-   by the time the EndScreen is about to reveal. */
+/* Self-rescheduling flicker with an attack/release envelope on the tick
+   interval: ramps fast for ~140ms (attack), then ease-in quad winds it down
+   into a slow pulse over ~1160ms (release), lining up with GameSession's
+   1300ms window before the EndScreen reveals. Discontinuous random hues on
+   purpose — it should read as processing, not as a tween. */
 export function animateBrandCalculating(containerEl: HTMLElement): () => void {
   const letters = Array.from(containerEl.children) as HTMLElement[];
 
   const ATTACK_MS = 140;
-  const RELEASE_MS = 1160; // attack + release ≈ GameSession's 1300ms window
-  const FAST_INTERVAL = 45; // peak flicker rate
-  const SLOW_START = 180; // first tick before the attack ramps in
-  const SLOW_END = 300; // interval the release settles into
+  const RELEASE_MS = 1160;
+  const FAST_INTERVAL = 45;
+  const SLOW_START = 180;
+  const SLOW_END = 300;
 
   const startedAt = performance.now();
   let timerId: number | null = null;
@@ -302,28 +267,23 @@ export function animateBrandCalculating(containerEl: HTMLElement): () => void {
     const elapsed = performance.now() - startedAt;
     let next: number;
     if (elapsed < ATTACK_MS) {
-      // interpolate SLOW_START → FAST_INTERVAL linearly over the attack window
       const t = elapsed / ATTACK_MS;
       next = SLOW_START + (FAST_INTERVAL - SLOW_START) * t;
     } else {
       const t = Math.min((elapsed - ATTACK_MS) / RELEASE_MS, 1);
-      // ease-in quad — flicker holds fast for most of the release, then
-      // audibly winds down into the reveal
       next = FAST_INTERVAL + (SLOW_END - FAST_INTERVAL) * t * t;
     }
     timerId = window.setTimeout(tick, next);
   };
 
-  tick(); // first jump happens immediately so the switch feels instant
+  tick();
 
   return () => {
     if (timerId !== null) window.clearTimeout(timerId);
   };
 }
 
-/* ============================================================
-   picker entrance
-   ============================================================ */
+/* ---------- picker entrance / exit ---------- */
 
 export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
   if (prefersReducedMotion()) return;
@@ -344,21 +304,12 @@ export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
   });
 }
 
-export function animatePickerOut(cardEl: HTMLElement, optionEls: HTMLElement[]) {
+export function animatePickerOut(cardEl: HTMLElement) {
   if (prefersReducedMotion()) return;
-  utils.set(cardEl, { opacity: 1, translateY: -8 });
-  utils.set(optionEls, { opacity: 1, translateX: 6 });
   return animate(cardEl, {
     opacity: [1, 0],
     translateY: [0, -8],
     duration: 220,
     ease: 'outQuart',
   });
-  // animate(optionEls, {
-  //   opacity: [0, 1],
-  //   translateX: [-6, 0],
-  //   duration: 180,
-  //   delay: stagger(28, { start: 60 }),
-  //   ease: 'outQuart',
-  // });
 }

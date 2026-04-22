@@ -1,5 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { animateDrawTitle, animateEndCardIn, animateLossTitle, animateWinTitle } from '../anim';
+import {
+  animateDrawTitle,
+  animateEndCardIn,
+  animateEndCardOut,
+  animateLossTitle,
+  animateWinTitle,
+} from '../anim';
 import { useGameSounds } from '../audio';
 import type { GameResult } from '../game/stats';
 import { DifficultyPicker } from './DifficultyPicker';
@@ -98,8 +104,9 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
           <Button
             block
             hue={accentHue}
-            onClick={() => {
+            onClick={async () => {
               sounds.button();
+              if (cardRef.current) await animateEndCardOut(cardRef.current);
               onReplay(difficulty);
             }}
             autoFocus

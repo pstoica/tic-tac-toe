@@ -20,14 +20,20 @@ interface BoardProps {
 const VIEW = 300;
 const CELL = VIEW / 3;
 
+const GRID_LINES: ReadonlyArray<readonly [number, number, number, number]> = [
+  [CELL, 0, CELL, VIEW],
+  [CELL * 2, 0, CELL * 2, VIEW],
+  [0, CELL, VIEW, CELL],
+  [0, CELL * 2, VIEW, CELL * 2],
+];
+
 export function Board({ board, outcome, current, busy, onCellClick }: BoardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const turnBadgeRef = useRef<(HTMLDivElement | null)>(null);
+  const turnBadgeRef = useRef<HTMLDivElement | null>(null);
   const cellRefs = useRef<(SVGGElement | null)[]>([]);
   const gridRefs = useRef<(SVGLineElement | null)[]>([]);
   const markRefs = useRef<(SVGGElement | null)[]>([]);
 
-  // mount: stagger the cells in
   useLayoutEffect(() => {
     if (!turnBadgeRef.current) return;
     const cells = cellRefs.current.filter((c): c is SVGGElement => !!c);
@@ -37,9 +43,8 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
 
   const winningSet = outcome.kind === 'win' ? new Set<number>(outcome.line) : null;
 
-  // when game ends: dim losers + pop winners (only on a win), and kick off
-  // the wrap-level fade-out so the board has already dimmed by the time
-  // GameSession flips the phase and EndScreen mounts on top.
+  // on game end: dim losers + pop winners on a win, and fade the whole wrap
+  // so the board has already dimmed by the time EndScreen mounts on top.
   useEffect(() => {
     if (outcome.kind === 'ongoing') return;
     if (outcome.kind === 'win') {
@@ -95,7 +100,6 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         role="grid"
         aria-label="tic tac toe board"
       >
-        {/* cells */}
         {Array.from({ length: 9 }, (_, i) => {
           const x = (i % 3) * CELL;
           const y = Math.floor(i / 3) * CELL;
@@ -141,52 +145,22 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
           );
         })}
 
-        {/* grid lines — full span of the viewBox */}
-        <line
-          ref={el => {
-            gridRefs.current[0] = el;
-          }}
-          className={styles.boardGridLine}
-          x1={CELL}
-          y1={0}
-          x2={CELL}
-          y2={VIEW}
-        />
-        <line
-          ref={el => {
-            gridRefs.current[1] = el;
-          }}
-          className={styles.boardGridLine}
-          x1={CELL * 2}
-          y1={0}
-          x2={CELL * 2}
-          y2={VIEW}
-        />
-        <line
-          ref={el => {
-            gridRefs.current[2] = el;
-          }}
-          className={styles.boardGridLine}
-          x1={0}
-          y1={CELL}
-          x2={VIEW}
-          y2={CELL}
-        />
-        <line
-          ref={el => {
-            gridRefs.current[3] = el;
-          }}
-          className={styles.boardGridLine}
-          x1={0}
-          y1={CELL * 2}
-          x2={VIEW}
-          y2={CELL * 2}
-        />
+        {GRID_LINES.map(([x1, y1, x2, y2], i) => (
+          <line
+            key={i}
+            ref={el => {
+              gridRefs.current[i] = el;
+            }}
+            className={styles.boardGridLine}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+          />
+        ))}
 
-        {/* marks — each wrapped in its own nested <svg> with overflow:hidden
-            so its viewport clips anything outside the tile (ghost particle
-            trails). the mark is positioned at the center of the inner
-            viewport, not in board-level coordinates. */}
+        {/* each mark lives in its own nested <svg> — overflow:hidden on that
+            viewport clips the ghost-particle trail at the cell edge. */}
         {board.map((cell, i) => {
           if (!cell) return null;
           const x = (i % 3) * CELL;
