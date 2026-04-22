@@ -325,3 +325,20 @@ export function animatePickerOut(cardEl: HTMLElement) {
     ease: 'outQuart',
   });
 }
+
+/* Chunky-button press stamp — held through the picker exit so the click
+   reads as a deliberate press even though animatePickerOut is already
+   fading the whole picker off the screen. */
+export function animateCardPress(el: HTMLElement) {
+  if (prefersReducedMotion()) return;
+  animate(el, {
+    translateY: [
+      { to: 5, duration: 90, ease: 'outQuad' },
+      { to: 5, duration: 200 },
+    ],
+    scale: [
+      { to: 0.97, duration: 90, ease: 'outQuad' },
+      { to: 0.97, duration: 200 },
+    ],
+  });
+}
