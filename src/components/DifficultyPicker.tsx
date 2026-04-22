@@ -65,6 +65,8 @@ export function DifficultyPicker({
                 {
                   '--accent-hue': opt.hue,
                   '--tilt': `${opt.tilt}deg`,
+                  // negative delay starts each card at a different phase of the rock cycle
+                  animationDelay: `${i * -1400}ms`,
                 } as React.CSSProperties
               }
               onClick={() => setSelected(opt.value)}
