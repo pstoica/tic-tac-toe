@@ -23,12 +23,17 @@ type Phase =
 export function App() {
   const [phase, setPhase] = useState<Phase>({ kind: 'pick' });
   const [stats, setStats] = useState(() => loadStats());
+  // true for the pre-EndScreen window where GameSession is waiting to resolve —
+  // drives the brand wordmark's "calculating" flicker
+  const [calculating, setCalculating] = useState(false);
 
   const startGame = useCallback((difficulty: Difficulty) => {
+    setCalculating(false);
     setPhase({ kind: 'playing', difficulty, gameId: Date.now() });
   }, []);
 
   const finishGame = useCallback((difficulty: Difficulty, result: GameResult) => {
+    setCalculating(false);
     setStats(prev => {
       const next = appendResult(prev, { result, difficulty, at: new Date().toISOString() });
       saveStats(next);
@@ -36,6 +41,8 @@ export function App() {
     });
     setPhase({ kind: 'finished', difficulty, result });
   }, []);
+
+  const handleCalculating = useCallback(() => setCalculating(true), []);
 
   const resetHistory = useCallback(() => {
     clearStats();
@@ -48,7 +55,7 @@ export function App() {
       <div className="app">
         <div className="stage">
           <div className="stage__top">
-            <Brand />
+            <Brand calculating={calculating} />
             <StatsBar stats={stats} onReset={resetHistory} />
           </div>
 
@@ -60,6 +67,7 @@ export function App() {
                 key={phase.gameId}
                 difficulty={phase.difficulty}
                 onFinish={result => finishGame(phase.difficulty, result)}
+                onCalculating={handleCalculating}
               />
             )}
 

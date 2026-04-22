@@ -9,9 +9,11 @@ import type { Board as BoardType, Difficulty, Mark, Outcome } from '../game/type
 interface GameSessionProps {
   difficulty: Difficulty;
   onFinish: (result: GameResult) => void;
+  /** fired once when the outcome settles and we start the pre-EndScreen delay */
+  onCalculating?: () => void;
 }
 
-export function GameSession({ difficulty, onFinish }: GameSessionProps) {
+export function GameSession({ difficulty, onFinish, onCalculating }: GameSessionProps) {
   const [board, setBoard] = useState<BoardType>(EMPTY_BOARD);
   const [current, setCurrent] = useState<Mark>(HUMAN_MARK);
 
@@ -52,11 +54,12 @@ export function GameSession({ difficulty, onFinish }: GameSessionProps) {
   useEffect(() => {
     if (outcome.kind === 'ongoing' || finishedRef.current) return;
     finishedRef.current = true;
+    onCalculating?.();
     const result: GameResult =
       outcome.kind === 'draw' ? 'draw' : outcome.winner === HUMAN_MARK ? 'win' : 'loss';
     const t = window.setTimeout(() => onFinish(result), 1300);
     return () => window.clearTimeout(t);
-  }, [outcome, onFinish]);
+  }, [outcome, onFinish, onCalculating]);
 
   const handleCellClick = useCallback(
     (idx: number) => {

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
-import { animateBrandHues } from '../anim';
+import { animateBrandCalculating, animateBrandHues } from '../anim';
 import styles from './Brand.module.css';
 
 const BRAND_CHARS: ReadonlyArray<{ ch: string; kind: 'letter' | 'dot' }> = [
@@ -16,12 +16,21 @@ const BRAND_CHARS: ReadonlyArray<{ ch: string; kind: 'letter' | 'dot' }> = [
   { ch: 'e', kind: 'letter' },
 ];
 
-export function Brand() {
+interface BrandProps {
+  /** flicker the per-letter hues randomly while the game is resolving */
+  calculating?: boolean;
+}
+
+export function Brand({ calculating = false }: BrandProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (ref.current) animateBrandHues(ref.current);
-  }, []);
+    if (!ref.current) return;
+    const cleanup = calculating
+      ? animateBrandCalculating(ref.current)
+      : animateBrandHues(ref.current);
+    return cleanup;
+  }, [calculating]);
 
   return (
     <div className={styles.brand} ref={ref} aria-label="tictactoe">

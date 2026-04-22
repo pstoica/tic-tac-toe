@@ -277,6 +277,22 @@ export function animateBrandHues(containerEl: HTMLElement) {
   return () => animations.forEach(a => a.pause());
 }
 
+/* "calculating" flicker — each letter gets a fresh random hue on every tick,
+   so instead of a coherent spectrum shift the wordmark reads as processing.
+   cheap setInterval rather than anime.js because the values are deliberately
+   discontinuous; no tween, no easing. */
+export function animateBrandCalculating(containerEl: HTMLElement): () => void {
+  const letters = Array.from(containerEl.children) as HTMLElement[];
+  const tick = () => {
+    letters.forEach(el => {
+      el.style.setProperty('--letter-hue', String(Math.floor(Math.random() * 360)));
+    });
+  };
+  tick(); // first jump happens immediately so the switch feels instant
+  const id = window.setInterval(tick, 75);
+  return () => window.clearInterval(id);
+}
+
 /* ============================================================
    picker entrance
    ============================================================ */
