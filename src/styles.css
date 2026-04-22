@@ -198,6 +198,9 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  /* drop shadow is on the wrapper, not the <svg>, because filter on the SVG
+     promotes it to an atomic flattened group and kills the 3D context */
+  filter: drop-shadow(0 22px 50px oklch(0% 0 0 / 0.55));
 }
 
 .board {
@@ -205,9 +208,8 @@ button {
   width: var(--size);
   height: var(--size);
   display: block;
-  filter: drop-shadow(0 22px 50px oklch(0% 0 0 / 0.55));
-  /* establish a 3D rendering context so the ghost trail's rotateX/Y actually
-     shows depth instead of collapsing to a 2D squish */
+  /* establish a 3D rendering context so the ghost trail's rotateX/Y can
+     actually foreshorten instead of collapsing to a 2D squish */
   perspective: 700px;
   transform-style: preserve-3d;
 }
@@ -292,7 +294,8 @@ button {
   pointer-events: none;
   transform-box: fill-box;
   transform-origin: center;
-  filter: drop-shadow(0 0 6px oklch(82% 0.18 var(--ghost-hue, 285) / 0.6));
+  /* force a dedicated GPU layer so the 3D transforms render as 3D */
+  will-change: transform, opacity;
 }
 
 .win-slash {

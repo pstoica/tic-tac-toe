@@ -1,7 +1,5 @@
 import { animate, stagger, utils } from 'animejs';
 
-type AnimateParams = Parameters<typeof animate>[1];
-
 /* ============================================================
    helpers
    ============================================================ */
@@ -46,58 +44,56 @@ export function animateBoardIn(cellEls: SVGGElement[], gridLineEls: SVGLineEleme
 }
 
 /* ============================================================
-   mark draw-in — group grows, then the stroke traces itself.
-   X is two separate <path>s (diagonal a, diagonal b) so each can
-   draw independently and stagger; O is a single circle path.
+   mark pop-in — the main mark snaps in via a scale pop on the group.
+   no stroke-dash trace; the ghost trail is the flourish.
    ============================================================ */
 
 export function animateMarkGrow(groupEl: SVGGElement) {
   if (prefersReducedMotion()) return;
-  utils.set(groupEl, { scale: 0 });
+  utils.set(groupEl, { scale: 0, opacity: 0 });
   animate(groupEl, {
+    opacity: [{ to: 1, duration: 90, ease: 'outQuad' }],
     scale: [
-      { to: 1.12, duration: 170, ease: 'outBack(1.8)' },
+      { to: 1.14, duration: 180, ease: 'outBack(2.2)' },
       { to: 1,    duration: 180, ease: 'outQuad' },
     ],
   });
 }
 
-export function animateMarkIn(paths: SVGPathElement[], params?: Partial<AnimateParams>) {
-  if (prefersReducedMotion()) return;
-  paths.forEach((pathEl, i) => {
-    const len = pathLength(pathEl);
-    pathEl.style.strokeDasharray = `${len}`;
-    pathEl.style.strokeDashoffset = `${len}`;
-    animate(pathEl, {
-      // hold hidden while the group grows, then draw
-      strokeDashoffset: [
-        { to: len, duration: 160, ease: 'linear' },
-        { to: 0,   duration: 320, ease: 'outQuart' },
-      ],
-      delay: i * 90,
-      ...(params ?? {}),
-    });
-  });
-}
-
 /* LERP trail on placement (iOS FaceID style): each ghost is a frozen pose
    sampled along a shared shrink-and-rotate trajectory. only opacity animates
-   per ghost — the stagger of flashes is what creates the motion.
-   rotation stays within one symmetry unit of the X shape (0 → -90°) so the
-   step between adjacent ghosts reads as a fine "knurl" rather than a jump.
-   a gentle 3D sway (rotateX half-wave + rotateY full-wave, both small
-   amplitudes) adds slight curvature to the trail without reading as a flip. */
+   per ghost — the stagger of flashes creates the motion.
+
+   the per-ghost pose layers four things so there's visible variation across
+   the trail without breaking the LERP feel:
+     1. knurl rotation on Z (0 → -90°, within one X-symmetry unit)
+     2. scale shrink (0.92 → 0.10) toward the midpoint
+     3. real 3D tilt (rotateX / rotateY sine waves) — only renders if the
+        perspective context is preserved up the ancestor chain
+     4. non-uniform scale oscillation (scaleX / scaleY phase-shifted sines),
+        which reads as an aspect-ratio wobble and is the reliable fallback
+        for engines that flatten SVG 3D transforms */
 export function animateMarkGhosts(paths: SVGPathElement[]) {
   if (prefersReducedMotion()) return;
   const n = paths.length;
   if (n === 0) return;
   paths.forEach((el, i) => {
-    const t = n === 1 ? 0 : i / (n - 1);              // 0 → 1 across ghosts
-    const rotation = -90 * t;                          // knurl rotation on Z
-    const scale    = 0.92 - 0.82 * t;                  // shrink to midpoint
-    const rotateY  = 28 * Math.sin(t * Math.PI * 2);   // full wave: 0, +28, 0, -28, 0
-    const rotateX  = -14 * Math.sin(t * Math.PI);      // half wave, peak in middle
-    utils.set(el, { rotate: rotation, scale, rotateX, rotateY, opacity: 0 });
+    const t = n === 1 ? 0 : i / (n - 1);                // 0 → 1 across ghosts
+    const rotation = -90 * t;                            // knurl on Z
+    const base     = 0.92 - 0.82 * t;                    // shrink to midpoint
+    const rotateY  = 34 * Math.sin(t * Math.PI * 2);     // full wave ±34°
+    const rotateX  = -18 * Math.sin(t * Math.PI);        // half wave, peak mid
+    // phase-offset non-uniform scale so adjacent ghosts have distinctly
+    // different aspect ratios — fake 3D lean, visible even when real
+    // rotateX/Y gets flattened by the renderer.
+    const scaleX = base * (1 + 0.22 * Math.sin(t * Math.PI * 2));
+    const scaleY = base * (1 - 0.22 * Math.cos(t * Math.PI * 2));
+    utils.set(el, {
+      rotate: rotation,
+      scaleX, scaleY,
+      rotateX, rotateY,
+      opacity: 0,
+    });
     animate(el, {
       opacity: [
         { to: 0.55, duration: 50,  ease: 'outQuad' },
