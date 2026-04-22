@@ -21,21 +21,23 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
     return (
       <div className="stats stats--confirm" role="alertdialog" aria-label="reset history confirmation">
         <span className="stats__confirm-text">Reset history?</span>
-        <button
-          type="button"
-          className="stats__confirm-btn stats__confirm-btn--yes"
-          onClick={() => { onReset(); setConfirming(false); }}
-          autoFocus
-        >
-          Yes
-        </button>
-        <button
-          type="button"
-          className="stats__confirm-btn stats__confirm-btn--no"
-          onClick={() => setConfirming(false)}
-        >
-          No
-        </button>
+        <div className="stats__confirm-btns">
+          <button
+            type="button"
+            className="stats__confirm-btn stats__confirm-btn--yes"
+            onClick={() => { onReset(); setConfirming(false); }}
+            autoFocus
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            className="stats__confirm-btn stats__confirm-btn--no"
+            onClick={() => setConfirming(false)}
+          >
+            No
+          </button>
+        </div>
       </div>
     );
   }

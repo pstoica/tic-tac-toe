@@ -60,45 +60,35 @@ export function animateMarkGrow(groupEl: SVGGElement) {
   });
 }
 
-/* deterministic pseudo-random in [0, 1) per (index, stream). keeps the
-   ghost trail feeling random while staying reproducible across runs. */
-function prand(i: number, stream: number): number {
-  const v = Math.sin(i * 12.9898 + stream * 78.233) * 43758.5453;
-  return v - Math.floor(v);
-}
-
 /* collision-particle burst on placement: each ghost is a static, independent
-   snapshot — scattered at a random radial offset from the placement point,
-   at its own scale/rotation/3D-tilt — and only opacity animates. the
-   stagger of flashes + scattered positions reads as debris catching a
-   strobe, not a uniform shrink toward the center.
+   snapshot — small debris scattered at a random radial offset inside the
+   cell, at its own scaleX/Y, rotation, and 3D tilt — and only opacity
+   animates.
 
-   positions are deterministic per ghost (hashed from index) so the scatter
-   is stable across renders of the same placement. */
+   parameters are fully re-rolled on every placement (Math.random rather
+   than hashed-from-index) so two X's never produce the same scatter.
+   values are clamped small enough to stay inside the cell even at small
+   renders; the <clipPath> in Board.tsx is the hard backstop. */
 export function animateMarkGhosts(paths: SVGPathElement[]) {
   if (prefersReducedMotion()) return;
   const n = paths.length;
   if (n === 0) return;
   paths.forEach((el, i) => {
-    // scatter around the placement point, polar so angles distribute evenly
-    const angle  = prand(i, 1) * Math.PI * 2;
-    const radius = 12 + prand(i, 2) * 44;           // 12 → 56 px from center
+    const angle  = Math.random() * Math.PI * 2;
+    const radius = 2 + Math.random() * 15;           // 2 → 17 from center
     const tx = Math.cos(angle) * radius;
     const ty = Math.sin(angle) * radius;
 
-    // varied particle size — some debris tiny, some chunky. axes independent
-    // so silhouettes look distinct rather than uniform.
-    const scaleX = 0.22 + prand(i, 3) * 0.7;        // 0.22 → 0.92
-    const scaleY = 0.22 + prand(i, 4) * 0.7;
+    const scaleX = 0.12 + Math.random() * 0.32;      // 0.12 → 0.44
+    const scaleY = 0.12 + Math.random() * 0.32;
 
-    // each particle caught at its own rotation + 3D tilt
-    const rotate  = (prand(i, 5) - 0.5) * 220;      // ±110°
-    const rotateX = (prand(i, 6) - 0.5) * 90;       // ±45°
-    const rotateY = (prand(i, 7) - 0.5) * 90;
+    const rotate  = (Math.random() - 0.5) * 260;     // ±130°
+    const rotateX = (Math.random() - 0.5) * 100;     // ±50°
+    const rotateY = (Math.random() - 0.5) * 100;
 
-    const peak      = 0.38 + prand(i, 8) * 0.4;     // 0.38 → 0.78
-    const fadeInMs  = 30 + Math.round(prand(i, 9) * 30);
-    const fadeOutMs = 110 + Math.round(prand(i, 10) * 140);
+    const peak      = 0.32 + Math.random() * 0.48;   // 0.32 → 0.80
+    const fadeInMs  = 28 + Math.round(Math.random() * 42);
+    const fadeOutMs = 90  + Math.round(Math.random() * 160);
 
     utils.set(el, {
       translateX: tx,

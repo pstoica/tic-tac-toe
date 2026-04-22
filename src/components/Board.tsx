@@ -84,6 +84,20 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         )}
       </div>
       <svg className="board" viewBox={`0 0 ${VIEW} ${VIEW}`} role="grid" aria-label="tic tac toe board">
+        {/* per-cell clipPaths so the particle scatter is hard-bounded to the
+            placed cell regardless of render size */}
+        <defs>
+          {Array.from({ length: 9 }, (_, i) => {
+            const x = (i % 3) * CELL;
+            const y = Math.floor(i / 3) * CELL;
+            return (
+              <clipPath key={i} id={`cell-clip-${i}`}>
+                <rect x={x} y={y} width={CELL} height={CELL} />
+              </clipPath>
+            );
+          })}
+        </defs>
+
         {/* cells */}
         {Array.from({ length: 9 }, (_, i) => {
           const x = (i % 3) * CELL;
@@ -141,6 +155,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
             <g
               key={`mark-${i}-${cell}`}
               ref={el => { markRefs.current[i] = el; }}
+              clipPath={`url(#cell-clip-${i})`}
             >
               <Mark mark={cell} cx={cx} cy={cy} size={52} />
             </g>

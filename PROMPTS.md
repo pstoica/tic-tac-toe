@@ -133,3 +133,15 @@ A running log of prompts supplied during this interview-project build.
 > similar optical alignment issue with this X reset button.
 >
 > for the ghost animations.. lets actually make it feel a bit more like randomly placed collision particles instead of all scaling down to the center.
+
+---
+
+## Prompt 18 — 2026-04-22
+
+> i think we should still constrain the ghosts to the box (no overflow rendering), and perhaps make them all smaller. it's still rendering like the exact same animation each time. if anything we can randomize more of the params instead of running across curves.
+
+---
+
+## Prompt 19 — 2026-04-22
+
+> /btw we should do a smaller gap between the Yes/No buttons
