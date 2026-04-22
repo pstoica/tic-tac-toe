@@ -1,8 +1,11 @@
 /* transparent pass-through — the endCard itself is the visual focus;
-   no modal backdrop / blur layer needed around it */
+   no modal backdrop / blur layer needed around it. width: 100% so the
+   card inside still has room to hit its max-width cap instead of
+   collapsing to the intrinsic width of "YOU WIN". */
 .end {
   display: grid;
   place-items: center;
+  width: 100%;
   padding: 8px;
 }
 
