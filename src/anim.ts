@@ -299,7 +299,8 @@ export function animateBrandCalculating(containerEl: HTMLElement): () => void {
 
 // held back long enough for the #root page fade-in (520ms) to settle before
 // the picker's own stagger kicks in, so the two entrances don't overlap.
-const PICKER_ENTER_DELAY = 440;
+// only applies to first-load — re-entries from EndScreen use a plain fade.
+const PICKER_ENTER_DELAY = 600;
 
 export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
   if (prefersReducedMotion()) return;
@@ -316,7 +317,7 @@ export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
     opacity: [0, 1],
     translateX: [-6, 0],
     duration: 180,
-    delay: stagger(28, { start: PICKER_ENTER_DELAY + 60 }),
+    delay: stagger(40, { start: PICKER_ENTER_DELAY + 60 }),
     ease: 'outQuart',
     // anime.js leaves the final frame's transform inline, which outranks
     // .btn:active's translateY in CSS and makes the press look dead. drop
@@ -335,6 +336,18 @@ export function animatePickerOut(cardEl: HTMLElement) {
     opacity: [1, 0],
     translateY: [0, -8],
     duration: 220,
+    ease: 'outQuart',
+  });
+}
+
+// EndScreen → picker re-entry: no stagger / no delay, just an opacity fade
+// so it reads as a smooth handoff after animateEndCardOut runs.
+export function animatePickerFadeIn(cardEl: HTMLElement) {
+  if (prefersReducedMotion()) return;
+  utils.set(cardEl, { opacity: 0 });
+  animate(cardEl, {
+    opacity: [0, 1],
+    duration: 260,
     ease: 'outQuart',
   });
 }

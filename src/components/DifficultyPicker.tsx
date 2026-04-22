@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { ensureReady } from '@web-kits/audio';
-import { animatePickerIn, animatePickerOut } from '../anim';
+import { animatePickerFadeIn, animatePickerIn, animatePickerOut } from '../anim';
 import { useGameSounds } from '../audio';
 import type { Difficulty } from '../game/types';
 import styles from './DifficultyPicker.module.css';
@@ -9,6 +9,9 @@ import { Button } from './Button';
 interface DifficultyPickerProps {
   title?: string;
   onConfirm: (difficulty: Difficulty) => void;
+  /** 'stagger' is the delayed first-load entrance; 'fade' is the plain
+      fade used when the picker is taking over from the EndScreen card. */
+  entrance?: 'stagger' | 'fade';
 }
 
 interface Option {
@@ -27,6 +30,7 @@ const OPTIONS: Option[] = [
 export function DifficultyPicker({
   title = 'Choose your difficulty',
   onConfirm,
+  entrance = 'stagger',
 }: DifficultyPickerProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -34,8 +38,14 @@ export function DifficultyPicker({
 
   useLayoutEffect(() => {
     if (!cardRef.current) return;
+    if (entrance === 'fade') {
+      animatePickerFadeIn(cardRef.current);
+      return;
+    }
     const opts = optionRefs.current.filter((o): o is HTMLButtonElement => !!o);
     animatePickerIn(cardRef.current, opts);
+    // entrance is captured at mount — the picker only mounts once per phase
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSelect = async (value: Difficulty) => {

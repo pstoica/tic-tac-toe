@@ -78,7 +78,7 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
   if (showPicker) {
     return (
       <div className={styles.end} role="dialog" aria-modal="true" aria-label="choose next opponent">
-        <DifficultyPicker onConfirm={onReplay} />
+        <DifficultyPicker onConfirm={onReplay} entrance="fade" />
       </div>
     );
   }
@@ -135,8 +135,9 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
             }}
             block
             ghost
-            onClick={() => {
+            onClick={async () => {
               sounds.button();
+              if (cardRef.current) await animateEndCardOut(cardRef.current);
               setShowPicker(true);
             }}
             onKeyDown={e => onActionKeyDown(e, 1)}
