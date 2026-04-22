@@ -1,13 +1,26 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
-import { animateFloatingShape, type FloatingShapeParams } from '../anim';
+import { useMemo } from 'react';
 import styles from './Background.module.css';
 
-interface Shape extends FloatingShapeParams {
+interface Shape {
   type: 'X' | 'O';
   left: number;
   top: number;
   size: number;
   opacity: number;
+  hue: number;
+  huePeriod: number;
+  floatAmp: number;
+  floatPeriod: number;
+  floatDelay: number;
+  rotXAmp: number;
+  rotXPeriod: number;
+  rotXDelay: number;
+  rotYAmp: number;
+  rotYPeriod: number;
+  rotYDelay: number;
+  rotZAmp: number;
+  rotZPeriod: number;
+  rotZDelay: number;
 }
 
 const COLS = 3;
@@ -17,10 +30,12 @@ const MARGIN_PCT = 6;
 
 const rand = (min: number, max: number): number => min + Math.random() * (max - min);
 
-/* jittered-grid placement so shapes stay spaced out. sizes are pulled from
-   two bands (small + large) so the mix has real variety; smaller shapes
-   get slightly higher opacity so they don't disappear. animation periods
-   and amplitudes vary per shape so nothing moves in lockstep. */
+/* jittered-grid placement so shapes stay spaced out. sizes are split between
+   a small band and a large band so the mix reads as varied; smaller shapes
+   get a slightly higher opacity so they don't disappear. per-axis amplitudes
+   and periods are re-rolled per shape, and each axis gets a negative delay
+   equal to a random slice of its own period — that starts every shape mid-
+   cycle, so they're all on different phases right from mount. */
 function buildShapes(): Shape[] {
   const cellW = 100 / COLS;
   const cellH = 100 / ROWS;
@@ -31,6 +46,10 @@ function buildShapes(): Shape[] {
     const top = row * cellH + rand(MARGIN_PCT, cellH - MARGIN_PCT);
     const small = Math.random() < 0.45;
     const size = small ? rand(26, 72) : rand(90, 168);
+    const floatPeriod = rand(5500, 10500);
+    const rotXPeriod = rand(7000, 15000);
+    const rotYPeriod = rand(8500, 17000);
+    const rotZPeriod = rand(9000, 18000);
     return {
       type: Math.random() < 0.5 ? 'X' : 'O',
       left,
@@ -38,15 +57,19 @@ function buildShapes(): Shape[] {
       size,
       opacity: small ? rand(0.1, 0.16) : rand(0.08, 0.13),
       hue: Math.floor(rand(0, 360)),
-      floatAmp: rand(8, 20),
-      floatPeriod: rand(5500, 10500),
-      rotXAmp: rand(22, 55),
-      rotXPeriod: rand(7000, 15000),
-      rotYAmp: rand(22, 55),
-      rotYPeriod: rand(8500, 17000),
-      rotZAmp: rand(12, 36),
-      rotZPeriod: rand(9000, 18000),
       huePeriod: rand(22000, 46000),
+      floatAmp: rand(8, 20),
+      floatPeriod,
+      floatDelay: rand(0, floatPeriod),
+      rotXAmp: rand(22, 55),
+      rotXPeriod,
+      rotXDelay: rand(0, rotXPeriod),
+      rotYAmp: rand(22, 55),
+      rotYPeriod,
+      rotYDelay: rand(0, rotYPeriod),
+      rotZAmp: rand(12, 36),
+      rotZPeriod,
+      rotZDelay: rand(0, rotZPeriod),
     };
   });
 }
@@ -54,23 +77,6 @@ function buildShapes(): Shape[] {
 export function Background() {
   // lock positions at mount so re-renders don't re-roll the layout
   const shapes = useMemo(() => buildShapes(), []);
-  // one ref array per animated axis — each anime.js animation writes to the
-  // transform of exactly one element, so they never fight over the string
-  const floatRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const rotXRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const rotYRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const rotZRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useLayoutEffect(() => {
-    shapes.forEach((s, i) => {
-      const float = floatRefs.current[i];
-      const rotX = rotXRefs.current[i];
-      const rotY = rotYRefs.current[i];
-      const rotZ = rotZRefs.current[i];
-      if (!float || !rotX || !rotY || !rotZ) return;
-      animateFloatingShape({ float, rotX, rotY, rotZ }, s);
-    });
-  }, [shapes]);
 
   return (
     <div className={styles.bg} aria-hidden="true">
@@ -78,38 +84,34 @@ export function Background() {
         <div
           key={i}
           className={styles.shapeSlot}
-          style={{
-            left: `${s.left}%`,
-            top: `${s.top}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            opacity: s.opacity,
-          }}
+          style={
+            {
+              left: `${s.left}%`,
+              top: `${s.top}%`,
+              width: `${s.size}px`,
+              height: `${s.size}px`,
+              opacity: s.opacity,
+              '--hue-from': s.hue,
+              '--hue-period': `${s.huePeriod}ms`,
+              '--float-amp': `${s.floatAmp}px`,
+              '--float-period': `${s.floatPeriod}ms`,
+              '--float-delay': `-${s.floatDelay}ms`,
+              '--rx-amp': `${s.rotXAmp}deg`,
+              '--rx-period': `${s.rotXPeriod}ms`,
+              '--rx-delay': `-${s.rotXDelay}ms`,
+              '--ry-amp': `${s.rotYAmp}deg`,
+              '--ry-period': `${s.rotYPeriod}ms`,
+              '--ry-delay': `-${s.rotYDelay}ms`,
+              '--rz-amp': `${s.rotZAmp}deg`,
+              '--rz-period': `${s.rotZPeriod}ms`,
+              '--rz-delay': `-${s.rotZDelay}ms`,
+            } as React.CSSProperties
+          }
         >
-          <div
-            ref={el => {
-              floatRefs.current[i] = el;
-            }}
-            className={styles.shapeLayer}
-          >
-            <div
-              ref={el => {
-                rotXRefs.current[i] = el;
-              }}
-              className={styles.shapeLayer}
-            >
-              <div
-                ref={el => {
-                  rotYRefs.current[i] = el;
-                }}
-                className={styles.shapeLayer}
-              >
-                <div
-                  ref={el => {
-                    rotZRefs.current[i] = el;
-                  }}
-                  className={styles.shapeLayer}
-                >
+          <div className={`${styles.shapeLayer} ${styles.shapeFloat}`}>
+            <div className={`${styles.shapeLayer} ${styles.shapeRotX}`}>
+              <div className={`${styles.shapeLayer} ${styles.shapeRotY}`}>
+                <div className={`${styles.shapeLayer} ${styles.shapeRotZ}`}>
                   <svg viewBox="-50 -50 100 100">
                     {s.type === 'X' ? (
                       <path
