@@ -17,64 +17,21 @@
 .picker__options {
   display: grid;
   gap: 16px;
-  /* room for the tilted cards to breathe without being clipped */
   padding: 6px 4px;
 }
 
 .opt-card {
   --accent-hue: 285;
-  --tilt: 0deg;
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 22px;
-  border-radius: 14px;
-  border: 0;
-  background: oklch(62% 0.2 var(--accent-hue));
-  color: oklch(14% 0.05 var(--accent-hue));
-  /* matches the chunky Button: solid drop + ambient + inset top highlight.
-     no outer ring at rest — hover brings a subtle rim in. */
-  box-shadow:
-    0 6px 0 oklch(36% 0.14 var(--accent-hue)),
-    0 14px 24px oklch(0% 0 0 / 0.45),
-    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.55);
-  text-align: left;
-  transform: rotate(var(--tilt));
-  transition:
-    transform 90ms ease,
-    box-shadow 120ms ease,
-    filter 160ms ease;
-  user-select: none;
-  cursor: pointer;
 }
 
-/* exaggerate the wonky tilt + a brightness nudge + inset rim so the edge
-   actually reads as "interactive" instead of just a tilt shift */
-.opt-card:hover {
-  transform: rotate(calc(var(--tilt) * 1.5));
-  filter: brightness(1.05);
-  box-shadow:
-    0 6px 0 oklch(36% 0.14 var(--accent-hue)),
-    0 14px 24px oklch(0% 0 0 / 0.45),
-    inset 0 0 0 2px oklch(94% 0.12 var(--accent-hue) / 0.85),
-    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.6);
+.opt-card:hover .opt-card__star--on {
+  color: oklch(100% 0.3 var(--btn-hue));
+  text-shadow: 0 0 12px oklch(98% 0.08 var(--btn-hue) / 0.9);
 }
 
 .opt-card:focus-visible {
   outline: 3px solid oklch(92% 0.15 var(--accent-hue));
   outline-offset: 3px;
-}
-
-/* press feedback — slide into the bottom shadow like the chunky Button.
-   hit area moves INTO where the cursor already is, so no flicker. */
-.opt-card:active {
-  transform: rotate(var(--tilt)) translateY(4px);
-  box-shadow:
-    0 2px 0 oklch(36% 0.14 var(--accent-hue)),
-    0 6px 10px oklch(0% 0 0 / 0.35),
-    inset 0 1.5px 0 oklch(96% 0.06 var(--accent-hue) / 0.4);
 }
 
 .opt-card__name {
@@ -91,8 +48,9 @@
   line-height: 1;
 }
 
-.opt-card__star {
+.opt-card__star--on {
   line-height: 1;
+  transition: color 150ms ease;
 }
 
 .opt-card__star--on {
@@ -102,4 +60,5 @@
 
 .opt-card__star--off {
   color: oklch(35% 0.1 var(--accent-hue) / 0.55);
+  display: none;
 }

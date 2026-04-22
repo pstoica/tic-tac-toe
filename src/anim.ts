@@ -277,3 +277,22 @@ export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
     ease: 'outQuart',
   });
 }
+
+export function animatePickerOut(cardEl: HTMLElement, optionEls: HTMLElement[]) {
+  if (prefersReducedMotion()) return;
+  utils.set(cardEl, { opacity: 1, translateY: -8 });
+  utils.set(optionEls, { opacity: 1, translateX: 6 });
+  return animate(cardEl, {
+    opacity: [1, 0],
+    translateY: [0, -8],
+    duration: 220,
+    ease: 'outQuart',
+  });
+  // animate(optionEls, {
+  //   opacity: [0, 1],
+  //   translateX: [-6, 0],
+  //   duration: 180,
+  //   delay: stagger(28, { start: 60 }),
+  //   ease: 'outQuart',
+  // });
+}

@@ -1,4 +1,4 @@
-import type { ComponentProps, CSSProperties, ReactNode } from 'react';
+import { forwardRef, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 import styles from './Button.module.css';
 
 type NativeButtonProps = Omit<ComponentProps<'button'>, 'className' | 'style' | 'children'>;
@@ -9,10 +9,11 @@ export interface ButtonProps extends NativeButtonProps {
   hue?: number;
   block?: boolean;
   ghost?: boolean;
+  className?: string;
 }
 
-export function Button({ children, hue, block, ghost, type = 'button', ...rest }: ButtonProps) {
-  const className = [styles.btn, block && styles.btnBlock, ghost && styles.btnGhost]
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ children, hue, block, ghost, type = 'button', className: classNameProp, ...rest }) => {
+  const className = [styles.btn, block && styles.btnBlock, ghost && styles.btnGhost, classNameProp]
     .filter(Boolean)
     .join(' ');
 
@@ -23,4 +24,4 @@ export function Button({ children, hue, block, ghost, type = 'button', ...rest }
       {children}
     </button>
   );
-}
+});
