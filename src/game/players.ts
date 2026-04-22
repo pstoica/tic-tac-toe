@@ -20,10 +20,14 @@ export class HumanPlayer implements Player {
         return;
       }
       this.pending = resolve;
-      signal.addEventListener('abort', () => {
-        this.pending = null;
-        reject(new DOMException('aborted', 'AbortError'));
-      }, { once: true });
+      signal.addEventListener(
+        'abort',
+        () => {
+          this.pending = null;
+          reject(new DOMException('aborted', 'AbortError'));
+        },
+        { once: true },
+      );
     });
   }
 
@@ -57,10 +61,14 @@ export class CpuPlayer implements Player {
       }
       const move = pickByDifficulty(board, this.mark, this.difficulty);
       const t = window.setTimeout(() => resolve(move), this.thinkMs);
-      signal.addEventListener('abort', () => {
-        window.clearTimeout(t);
-        reject(new DOMException('aborted', 'AbortError'));
-      }, { once: true });
+      signal.addEventListener(
+        'abort',
+        () => {
+          window.clearTimeout(t);
+          reject(new DOMException('aborted', 'AbortError'));
+        },
+        { once: true },
+      );
     });
   }
 }

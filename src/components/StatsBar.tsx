@@ -10,19 +10,19 @@ interface StatsBarProps {
 }
 
 const TOKEN: Record<GameResult, string> = {
-  win:  'W',
+  win: 'W',
   loss: 'L',
   draw: 'D',
 };
 
 const VALUE_CLASS: Record<GameResult, string> = {
-  win:  styles.statsValueWin,
+  win: styles.statsValueWin,
   loss: styles.statsValueLoss,
   draw: styles.statsValueDraw,
 };
 
 const TOKEN_CLASS: Record<GameResult, string> = {
-  win:  styles.statsTokenWin,
+  win: styles.statsTokenWin,
   loss: styles.statsTokenLoss,
   draw: styles.statsTokenDraw,
 };
@@ -33,13 +33,20 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
 
   if (confirming) {
     return (
-      <div className={`${styles.stats} ${styles.statsConfirm}`} role="alertdialog" aria-label="reset history confirmation">
+      <div
+        className={`${styles.stats} ${styles.statsConfirm}`}
+        role="alertdialog"
+        aria-label="reset history confirmation"
+      >
         <span className={styles.statsConfirmText}>Reset history?</span>
         <div className={styles.statsConfirmBtns}>
           <button
             type="button"
             className={`${styles.statsConfirmBtn} ${styles.statsConfirmBtnYes}`}
-            onClick={() => { onReset(); setConfirming(false); }}
+            onClick={() => {
+              onReset();
+              setConfirming(false);
+            }}
             autoFocus
           >
             Yes
@@ -103,9 +110,9 @@ interface StatsStripProps {
   recent: GameRecord[];
 }
 
-const TOKEN_STEP = 16;   // token width (12px) + gap (4px)
-const DURATION   = 340;
-const EASE       = 'outQuart';
+const TOKEN_STEP = 16; // token width (12px) + gap (4px)
+const DURATION = 340;
+const EASE = 'outQuart';
 
 function StatsStrip({ recent }: StatsStripProps) {
   const [displayed, setDisplayed] = useState<GameRecord[]>(recent);

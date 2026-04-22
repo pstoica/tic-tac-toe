@@ -19,7 +19,10 @@
     0 6px 0 oklch(36% 0.12 var(--btn-hue)),
     0 14px 24px oklch(0% 0 0 / 0.45),
     inset 0 1.5px 0 oklch(96% 0.06 var(--btn-hue) / 0.6);
-  transition: transform 90ms ease, box-shadow 90ms ease, background-color 200ms ease;
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    background-color 200ms ease;
   user-select: none;
 }
 
@@ -44,7 +47,9 @@
   outline-offset: 3px;
 }
 
-.btn--block { width: 100%; }
+.btn--block {
+  width: 100%;
+}
 
 .btn--ghost {
   background: oklch(18% 0.03 285);

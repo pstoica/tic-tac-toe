@@ -12,15 +12,19 @@ export const GHOST_COUNT = 20;
    ============================================================ */
 
 const prefersReducedMotion = (): boolean =>
-  typeof window !== 'undefined'
-  && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 
 function pathLength(el: SVGGeometryElement): number {
-  try { return el.getTotalLength(); } catch { return 100; }
+  try {
+    return el.getTotalLength();
+  } catch {
+    return 100;
+  }
 }
 
 // uniform random in [min, max] — makes the ghost params read as ranges
-const rand  = (min: number, max: number): number => min + Math.random() * (max - min);
+const rand = (min: number, max: number): number => min + Math.random() * (max - min);
 const irand = (min: number, max: number): number => Math.round(rand(min, max));
 
 /* ============================================================
@@ -29,8 +33,12 @@ const irand = (min: number, max: number): number => Math.round(rand(min, max));
 
 export function animateBoardIn(cellEls: SVGGElement[], gridLineEls: SVGLineElement[]) {
   if (prefersReducedMotion()) {
-    cellEls.forEach(el => { el.style.opacity = '1'; });
-    gridLineEls.forEach(el => { el.style.opacity = '1'; });
+    cellEls.forEach(el => {
+      el.style.opacity = '1';
+    });
+    gridLineEls.forEach(el => {
+      el.style.opacity = '1';
+    });
     return;
   }
 
@@ -66,7 +74,7 @@ export function animateMarkGrow(groupEl: SVGGElement) {
     opacity: [{ to: 1, duration: 90, ease: 'outQuad' }],
     scale: [
       { to: 1.14, duration: 180, ease: 'outBack(2.2)' },
-      { to: 1,    duration: 180, ease: 'outQuad' },
+      { to: 1, duration: 180, ease: 'outQuad' },
     ],
   });
 }
@@ -93,25 +101,28 @@ export function animateMarkGhosts(paths: SVGPathElement[]) {
     const scaleX = rand(0.1, 0.6);
     const scaleY = rand(0.1, 0.6);
 
-    const rotate  = rand(-180, 180);
+    const rotate = rand(-180, 180);
     const rotateX = rand(-90, 90);
     const rotateY = rand(-90, 90);
 
-    const peak      = rand(0.1, 1);
-    const fadeInMs  = irand(28, 70);
+    const peak = rand(0.1, 1);
+    const fadeInMs = irand(28, 70);
     const fadeOutMs = irand(200, 450);
 
     utils.set(el, {
       translateX: tx,
       translateY: ty,
-      scaleX, scaleY,
-      rotate, rotateX, rotateY,
+      scaleX,
+      scaleY,
+      rotate,
+      rotateX,
+      rotateY,
       opacity: 0,
     });
     animate(el, {
       opacity: [
-        { to: peak, duration: fadeInMs,  ease: 'outQuad' },
-        { to: 0,    duration: fadeOutMs, ease: 'outQuad' },
+        { to: peak, duration: fadeInMs, ease: 'outQuad' },
+        { to: 0, duration: fadeOutMs, ease: 'outQuad' },
       ],
       delay: i * 28,
     });
@@ -171,16 +182,16 @@ export function animateWinTitle(chars: HTMLElement[]) {
   if (prefersReducedMotion()) return () => {};
   // each char gets a hue offset for a rainbow wash
   chars.forEach((c, i) => {
-    c.style.setProperty('--char-hue', String(120 + (i * 22) % 220));
+    c.style.setProperty('--char-hue', String(120 + ((i * 22) % 220)));
   });
   const a = animate(chars, {
     translateY: [
       { to: -18, duration: 320, ease: 'outQuad' },
-      { to: 0,   duration: 520, ease: 'outBounce' },
+      { to: 0, duration: 520, ease: 'outBounce' },
     ],
     rotate: [
       { to: -4, duration: 320 },
-      { to: 0,  duration: 520, ease: 'outBack(1.4)' },
+      { to: 0, duration: 520, ease: 'outBack(1.4)' },
     ],
     delay: stagger(70),
     loop: true,
@@ -196,25 +207,25 @@ export function animateLossTitle(chars: HTMLElement[]) {
   const animations = chars.map((el, i) => {
     const sign = i % 2 === 0 ? 1 : -1;
     const rotAmp = 5 + (i % 3) * 2; // 5, 7, 9 rotated degrees
-    const yAmp   = 6 + (i % 2) * 2; // 6 or 8 px vertical
+    const yAmp = 6 + (i % 2) * 2; // 6 or 8 px vertical
     return animate(el, {
       translateY: [
-        { to: -yAmp * sign,     duration: 85,  ease: 'outQuad' },
-        { to:  yAmp * 0.7 * sign, duration: 95,  ease: 'inOutQuad' },
-        { to: -yAmp * 0.4 * sign, duration: 85,  ease: 'inOutQuad' },
-        { to:  yAmp * 0.2 * sign, duration: 90,  ease: 'inOutQuad' },
-        { to: 0,                duration: 140, ease: 'outQuad' },
+        { to: -yAmp * sign, duration: 85, ease: 'outQuad' },
+        { to: yAmp * 0.7 * sign, duration: 95, ease: 'inOutQuad' },
+        { to: -yAmp * 0.4 * sign, duration: 85, ease: 'inOutQuad' },
+        { to: yAmp * 0.2 * sign, duration: 90, ease: 'inOutQuad' },
+        { to: 0, duration: 140, ease: 'outQuad' },
       ],
       rotate: [
-        { to: -rotAmp * sign,     duration: 85 },
-        { to:  rotAmp * sign,     duration: 110 },
+        { to: -rotAmp * sign, duration: 85 },
+        { to: rotAmp * sign, duration: 110 },
         { to: -rotAmp * 0.5 * sign, duration: 85 },
-        { to: 0,                  duration: 140, ease: 'outBack(1.6)' },
+        { to: 0, duration: 140, ease: 'outBack(1.6)' },
       ],
       translateX: [
         { to: -1.5 * sign, duration: 100 },
-        { to:  1.5 * sign, duration: 100 },
-        { to: 0,           duration: 100 },
+        { to: 1.5 * sign, duration: 100 },
+        { to: 0, duration: 100 },
       ],
       delay: i * 48,
       loop: true,
@@ -229,7 +240,7 @@ export function animateDrawTitle(chars: HTMLElement[]) {
   const a = animate(chars, {
     opacity: [
       { to: 0.55, duration: 700, ease: 'inOutSine' },
-      { to: 1,    duration: 700, ease: 'inOutSine' },
+      { to: 1, duration: 700, ease: 'inOutSine' },
     ],
     delay: stagger(60),
     loop: true,
@@ -262,12 +273,14 @@ export function animateBrandHues(containerEl: HTMLElement) {
   letters.forEach((el, i) => {
     el.style.setProperty('--letter-hue', String((i * 36) % 360));
   });
-  const animations = letters.map((el, i) => animate(el, {
-    '--letter-hue': [(i * 36) % 360, ((i * 36) % 360) + 360],
-    duration: 9000,
-    ease: 'linear',
-    loop: true,
-  }));
+  const animations = letters.map((el, i) =>
+    animate(el, {
+      '--letter-hue': [(i * 36) % 360, ((i * 36) % 360) + 360],
+      duration: 9000,
+      ease: 'linear',
+      loop: true,
+    }),
+  );
   return () => animations.forEach(a => a.pause());
 }
 

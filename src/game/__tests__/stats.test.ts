@@ -1,13 +1,29 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { EMPTY_STATS, appendResult, clearStats, loadStats, saveStats, type GameRecord, type Stats } from '../stats';
+import {
+  EMPTY_STATS,
+  appendResult,
+  clearStats,
+  loadStats,
+  saveStats,
+  type GameRecord,
+  type Stats,
+} from '../stats';
 
 // in-memory localStorage shim so these tests can run under node without jsdom
 class MemoryStorage {
   private store = new Map<string, string>();
-  getItem(k: string) { return this.store.get(k) ?? null; }
-  setItem(k: string, v: string) { this.store.set(k, v); }
-  removeItem(k: string) { this.store.delete(k); }
-  clear() { this.store.clear(); }
+  getItem(k: string) {
+    return this.store.get(k) ?? null;
+  }
+  setItem(k: string, v: string) {
+    this.store.set(k, v);
+  }
+  removeItem(k: string) {
+    this.store.delete(k);
+  }
+  clear() {
+    this.store.clear();
+  }
 }
 
 beforeEach(() => {

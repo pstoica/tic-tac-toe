@@ -14,14 +14,18 @@ interface GameSessionProps {
 export function GameSession({ difficulty, onFinish }: GameSessionProps) {
   const [board, setBoard] = useState<BoardType>(EMPTY_BOARD);
   const [current, setCurrent] = useState<Mark>(HUMAN_MARK);
-  const [busy, setBusy] = useState(false);
 
-  const players = useMemo<Record<Mark, Player>>(() => ({
-    X: new HumanPlayer(HUMAN_MARK),
-    O: new CpuPlayer(CPU_MARK, difficulty),
-  }), [difficulty]);
+  const players = useMemo<Record<Mark, Player>>(
+    () => ({
+      X: new HumanPlayer(HUMAN_MARK),
+      O: new CpuPlayer(CPU_MARK, difficulty),
+    }),
+    [difficulty],
+  );
 
   const outcome: Outcome = useMemo(() => evaluate(board), [board]);
+  // derived from current + outcome — no need to track it as state
+  const busy = players[current].kind === 'cpu' && outcome.kind === 'ongoing';
   const finishedRef = useRef(false);
 
   useEffect(() => {
@@ -29,18 +33,18 @@ export function GameSession({ difficulty, onFinish }: GameSessionProps) {
     const player = players[current];
     const ac = new AbortController();
 
-    setBusy(player.kind === 'cpu');
-
-    player.chooseMove(board, ac.signal).then(idx => {
-      setBoard(prev => {
-        if (prev[idx] !== null) return prev;
-        return play(prev, idx, current);
+    player
+      .chooseMove(board, ac.signal)
+      .then(idx => {
+        setBoard(prev => {
+          if (prev[idx] !== null) return prev;
+          return play(prev, idx, current);
+        });
+        setCurrent(opposite(current));
+      })
+      .catch(err => {
+        if ((err as Error).name !== 'AbortError') console.error(err);
       });
-      setCurrent(opposite(current));
-      setBusy(false);
-    }).catch(err => {
-      if ((err as Error).name !== 'AbortError') console.error(err);
-    });
 
     return () => ac.abort();
   }, [board, current, outcome.kind, players]);
@@ -49,19 +53,20 @@ export function GameSession({ difficulty, onFinish }: GameSessionProps) {
     if (outcome.kind === 'ongoing' || finishedRef.current) return;
     finishedRef.current = true;
     const result: GameResult =
-      outcome.kind === 'draw' ? 'draw'
-      : outcome.winner === HUMAN_MARK ? 'win'
-      : 'loss';
+      outcome.kind === 'draw' ? 'draw' : outcome.winner === HUMAN_MARK ? 'win' : 'loss';
     const t = window.setTimeout(() => onFinish(result), 1300);
     return () => window.clearTimeout(t);
   }, [outcome, onFinish]);
 
-  const handleCellClick = useCallback((idx: number) => {
-    const human = players[HUMAN_MARK] as HumanPlayer;
-    if (current !== HUMAN_MARK) return;
-    if (board[idx] !== null) return;
-    human.submit(idx);
-  }, [board, current, players]);
+  const handleCellClick = useCallback(
+    (idx: number) => {
+      const human = players[HUMAN_MARK] as HumanPlayer;
+      if (current !== HUMAN_MARK) return;
+      if (board[idx] !== null) return;
+      human.submit(idx);
+    },
+    [board, current, players],
+  );
 
   return (
     <Board

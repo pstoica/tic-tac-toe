@@ -4,7 +4,14 @@ import { DifficultyPicker } from './components/DifficultyPicker';
 import { EndScreen } from './components/EndScreen';
 import { GameSession } from './components/GameSession';
 import { StatsBar } from './components/StatsBar';
-import { appendResult, clearStats, EMPTY_STATS, loadStats, saveStats, type GameResult } from './game/stats';
+import {
+  appendResult,
+  clearStats,
+  EMPTY_STATS,
+  loadStats,
+  saveStats,
+  type GameResult,
+} from './game/stats';
 import type { Difficulty } from './game/types';
 
 type Phase =
@@ -43,9 +50,7 @@ export function App() {
         </div>
 
         <div className="stage__main">
-          {phase.kind === 'pick' && (
-            <DifficultyPicker onConfirm={startGame} />
-          )}
+          {phase.kind === 'pick' && <DifficultyPicker onConfirm={startGame} />}
 
           {phase.kind === 'playing' && (
             <GameSession
@@ -56,11 +61,7 @@ export function App() {
           )}
 
           {phase.kind === 'finished' && (
-            <EndScreen
-              result={phase.result}
-              difficulty={phase.difficulty}
-              onReplay={startGame}
-            />
+            <EndScreen result={phase.result} difficulty={phase.difficulty} onReplay={startGame} />
           )}
         </div>
       </div>

@@ -22,9 +22,9 @@ interface Option {
 // tilts are deliberately small + fixed so the cards feel hand-placed without
 // jittering on re-render. one leans right, two lean left — asymmetric.
 const OPTIONS: Option[] = [
-  { value: 'easy',    name: 'Easy',    stars: 1, hue: 145, tilt: -2.2 },
-  { value: 'smart',   name: 'Smart',   stars: 2, hue: 275, tilt:  1.8 },
-  { value: 'perfect', name: 'Perfect', stars: 3, hue: 25,  tilt: -2.6 },
+  { value: 'easy', name: 'Easy', stars: 1, hue: 145, tilt: -2.2 },
+  { value: 'smart', name: 'Smart', stars: 2, hue: 275, tilt: 1.8 },
+  { value: 'perfect', name: 'Perfect', stars: 3, hue: 25, tilt: -2.6 },
 ];
 
 export function DifficultyPicker({
@@ -54,15 +54,19 @@ export function DifficultyPicker({
           return (
             <button
               key={opt.value}
-              ref={el => { optionRefs.current[i] = el; }}
+              ref={el => {
+                optionRefs.current[i] = el;
+              }}
               type="button"
               role="radio"
               aria-checked={isSelected}
               className={`${styles.optCard}${isSelected ? ` ${styles.optCardSelected}` : ''}`}
-              style={{
-                '--accent-hue': opt.hue,
-                '--tilt': `${opt.tilt}deg`,
-              } as React.CSSProperties}
+              style={
+                {
+                  '--accent-hue': opt.hue,
+                  '--tilt': `${opt.tilt}deg`,
+                } as React.CSSProperties
+              }
               onClick={() => setSelected(opt.value)}
             >
               <span className={styles.optCardName}>{opt.name}</span>

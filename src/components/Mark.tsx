@@ -38,7 +38,9 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
         {Array.from({ length: GHOST_COUNT }, (_, i) => (
           <path
             key={i}
-            ref={el => { ghostRefs.current[i] = el; }}
+            ref={el => {
+              ghostRefs.current[i] = el;
+            }}
             className={styles.markGhost}
             d={d}
             style={{ '--ghost-hue': (i * (360 / GHOST_COUNT)) % 360 } as React.CSSProperties}

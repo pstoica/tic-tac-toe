@@ -2,11 +2,7 @@ export type Mark = 'X' | 'O';
 
 export type Cell = Mark | null;
 
-export type Board = readonly [
-  Cell, Cell, Cell,
-  Cell, Cell, Cell,
-  Cell, Cell, Cell,
-];
+export type Board = readonly [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 
 export type WinLine = readonly [number, number, number];
 

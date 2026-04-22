@@ -6,10 +6,12 @@ A single-player tic-tac-toe against a CPU opponent, written as a client-side Rea
 
 ```bash
 npm install
-npm run dev         # http://localhost:5173
-npm test            # one-shot vitest run
-npm run typecheck   # tsc -b --noEmit
-npm run build       # type-check + production build into dist/
+npm run dev           # http://localhost:5173
+npm test              # one-shot vitest run
+npm run typecheck     # tsc -b --noEmit
+npm run lint          # eslint (react-hooks, typescript-eslint, prettier)
+npm run format        # prettier --write .
+npm run build         # type-check + production build into dist/
 ```
 
 Vite 6, React 19, TypeScript strict mode (`noUnusedLocals`, `noUnusedParameters`). Animations via anime.js v4.
@@ -64,4 +66,4 @@ src/
 
 - No two-player UI yet, but the plumbing is there: pass `HumanPlayer` for both marks in `GameSession`.
 - No component-level tests. The game logic is the interesting part to verify; the components are mostly view layer, and testing anime.js-driven animation behavior in jsdom gets expensive fast for thin signal.
-- No lint config checked in. TS strict catches the bulk of it; for team use I'd add eslint + prettier and wire them into CI.
+- CI isn't wired up — `lint`, `typecheck`, `test`, and `build` all pass locally and would be the four steps I'd put behind PRs.

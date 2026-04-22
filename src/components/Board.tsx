@@ -77,14 +77,21 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
           <>
             CPU
             <span className={styles.turnDots} aria-hidden="true">
-              <span /><span /><span />
+              <span />
+              <span />
+              <span />
             </span>
           </>
         ) : (
           <>YOUR TURN</>
         )}
       </div>
-      <svg className={styles.board} viewBox={`0 0 ${VIEW} ${VIEW}`} role="grid" aria-label="tic tac toe board">
+      <svg
+        className={styles.board}
+        viewBox={`0 0 ${VIEW} ${VIEW}`}
+        role="grid"
+        aria-label="tic tac toe board"
+      >
         {/* cells */}
         {Array.from({ length: 9 }, (_, i) => {
           const x = (i % 3) * CELL;
@@ -94,7 +101,9 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
           return (
             <g
               key={i}
-              ref={el => { cellRefs.current[i] = el; }}
+              ref={el => {
+                cellRefs.current[i] = el;
+              }}
             >
               <rect
                 className={styles.cellBg}
@@ -129,10 +138,46 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         })}
 
         {/* grid lines — full span of the viewBox */}
-        <line ref={el => { gridRefs.current[0] = el; }} className={styles.boardGridLine} x1={CELL} y1={0} x2={CELL} y2={VIEW} />
-        <line ref={el => { gridRefs.current[1] = el; }} className={styles.boardGridLine} x1={CELL * 2} y1={0} x2={CELL * 2} y2={VIEW} />
-        <line ref={el => { gridRefs.current[2] = el; }} className={styles.boardGridLine} x1={0} y1={CELL} x2={VIEW} y2={CELL} />
-        <line ref={el => { gridRefs.current[3] = el; }} className={styles.boardGridLine} x1={0} y1={CELL * 2} x2={VIEW} y2={CELL * 2} />
+        <line
+          ref={el => {
+            gridRefs.current[0] = el;
+          }}
+          className={styles.boardGridLine}
+          x1={CELL}
+          y1={0}
+          x2={CELL}
+          y2={VIEW}
+        />
+        <line
+          ref={el => {
+            gridRefs.current[1] = el;
+          }}
+          className={styles.boardGridLine}
+          x1={CELL * 2}
+          y1={0}
+          x2={CELL * 2}
+          y2={VIEW}
+        />
+        <line
+          ref={el => {
+            gridRefs.current[2] = el;
+          }}
+          className={styles.boardGridLine}
+          x1={0}
+          y1={CELL}
+          x2={VIEW}
+          y2={CELL}
+        />
+        <line
+          ref={el => {
+            gridRefs.current[3] = el;
+          }}
+          className={styles.boardGridLine}
+          x1={0}
+          y1={CELL * 2}
+          x2={VIEW}
+          y2={CELL * 2}
+        />
 
         {/* marks — each wrapped in its own nested <svg> with overflow:hidden
             so its viewport clips anything outside the tile (ghost particle
@@ -154,7 +199,12 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               viewBox={`0 0 ${inner} ${inner}`}
               style={{ overflow: 'hidden' }}
             >
-              <g ref={el => { markRefs.current[i] = el; }} className={styles.markCell}>
+              <g
+                ref={el => {
+                  markRefs.current[i] = el;
+                }}
+                className={styles.markCell}
+              >
                 <Mark mark={cell} cx={center} cy={center} size={52} />
               </g>
             </svg>

@@ -14,7 +14,9 @@
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 .stats--confirm {
@@ -33,7 +35,10 @@
   margin-left: 2px;
   margin-right: -4px;
   color: var(--ink-mute);
-  transition: color 120ms ease, background 120ms ease, transform 120ms ease;
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease;
 }
 
 .stats__reset-icon {
@@ -73,7 +78,9 @@
   font-weight: 900;
   letter-spacing: 0.1em;
   font-size: 10px;
-  transition: transform 90ms ease, background 120ms ease;
+  transition:
+    transform 90ms ease,
+    background 120ms ease;
 }
 
 .stats__confirm-btn--yes {
@@ -81,14 +88,19 @@
   color: oklch(14% 0.04 25);
 }
 
-.stats__confirm-btn--yes:hover { background: oklch(70% 0.19 25); }
+.stats__confirm-btn--yes:hover {
+  background: oklch(70% 0.19 25);
+}
 
 .stats__confirm-btn--no {
   background: oklch(22% 0.03 285);
   color: var(--ink-dim);
 }
 
-.stats__confirm-btn--no:hover { color: var(--ink); background: oklch(28% 0.04 285); }
+.stats__confirm-btn--no:hover {
+  color: var(--ink);
+  background: oklch(28% 0.04 285);
+}
 
 .stats__group {
   display: inline-flex;
@@ -109,9 +121,15 @@
   letter-spacing: 0;
 }
 
-.stats__value--win  { color: oklch(86% 0.16 145); }
-.stats__value--loss { color: oklch(82% 0.18 25); }
-.stats__value--draw { color: var(--ink-dim); }
+.stats__value--win {
+  color: oklch(86% 0.16 145);
+}
+.stats__value--loss {
+  color: oklch(82% 0.18 25);
+}
+.stats__value--draw {
+  color: var(--ink-dim);
+}
 
 /* fixed-width overflow container so the pill doesn't pulse when the row
    is transitioning an entry in/out. the inner row is what gets translated
@@ -148,6 +166,12 @@
   display: inline-block;
 }
 
-.stats__token--win  { color: oklch(86% 0.16 145); }
-.stats__token--loss { color: oklch(82% 0.18 25); }
-.stats__token--draw { color: var(--ink-dim); }
+.stats__token--win {
+  color: oklch(86% 0.16 145);
+}
+.stats__token--loss {
+  color: oklch(82% 0.18 25);
+}
+.stats__token--draw {
+  color: var(--ink-dim);
+}
