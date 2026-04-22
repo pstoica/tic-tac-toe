@@ -1,0 +1,40 @@
+/* scattered X/O shapes sit behind every screen — dimmed, slow float,
+   no pointer events so they never block the stage */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shape {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  animation: shapeFloat 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+.shape svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--shape-color, oklch(70% 0.1 280));
+}
+
+@keyframes shapeFloat {
+  0%,
+  100% {
+    transform: translate(-50%, calc(-50% + 0px));
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 14px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shape {
+    animation: none;
+  }
+}

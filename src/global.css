@@ -30,7 +30,7 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -74,6 +74,9 @@ button {
   display: grid;
   align-content: start;
   justify-items: center;
+  /* sit above the fixed Background layer */
+  position: relative;
+  z-index: 1;
 }
 
 .stage {

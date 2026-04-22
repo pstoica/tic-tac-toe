@@ -152,6 +152,21 @@ export function highlightWinningMarks(marks: SVGGElement[]) {
   });
 }
 
+/* fade the board wrapper down before the EndScreen takes over — the
+   GameSession waits 1300ms after the last move before firing onFinish,
+   so starting this at ~850ms lines the fade-out up with EndScreen's
+   fade-in for a real crossfade instead of a hard swap. */
+export function animateBoardOut(wrapEl: HTMLElement) {
+  if (prefersReducedMotion()) return;
+  animate(wrapEl, {
+    opacity: [1, 0.15],
+    scale: [1, 0.96],
+    duration: 420,
+    delay: 850,
+    ease: 'inQuad',
+  });
+}
+
 /* ============================================================
    end screen — mario-style title reactions
    ============================================================ */

@@ -1,5 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { animateBoardIn, dimNonWinningMarks, highlightWinningMarks } from '../anim';
+import {
+  animateBoardIn,
+  animateBoardOut,
+  dimNonWinningMarks,
+  highlightWinningMarks,
+} from '../anim';
 import type { Board as BoardType, Mark as MarkType, Outcome } from '../game/types';
 import { Mark } from './Mark';
 import styles from './Board.module.css';
@@ -16,6 +21,7 @@ const VIEW = 300;
 const CELL = VIEW / 3;
 
 export function Board({ board, outcome, current, busy, onCellClick }: BoardProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const turnBadgeRef = useRef<(HTMLDivElement | null)>(null);
   const cellRefs = useRef<(SVGGElement | null)[]>([]);
   const gridRefs = useRef<(SVGLineElement | null)[]>([]);
@@ -31,22 +37,27 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
 
   const winningSet = outcome.kind === 'win' ? new Set<number>(outcome.line) : null;
 
-  // when game ends, dim non-winning marks and pop the winning trio
+  // when game ends: dim losers + pop winners (only on a win), and kick off
+  // the wrap-level fade-out so the board has already dimmed by the time
+  // GameSession flips the phase and EndScreen mounts on top.
   useEffect(() => {
-    if (outcome.kind !== 'win') return;
-    const winSet = new Set(outcome.line);
-    const winning: SVGGElement[] = [];
-    const losing: SVGGElement[] = [];
-    markRefs.current.forEach((el, i) => {
-      if (!el) return;
-      (winSet.has(i) ? winning : losing).push(el);
-    });
-    dimNonWinningMarks(losing);
-    highlightWinningMarks(winning);
+    if (outcome.kind === 'ongoing') return;
+    if (outcome.kind === 'win') {
+      const winSet = new Set(outcome.line);
+      const winning: SVGGElement[] = [];
+      const losing: SVGGElement[] = [];
+      markRefs.current.forEach((el, i) => {
+        if (!el) return;
+        (winSet.has(i) ? winning : losing).push(el);
+      });
+      dimNonWinningMarks(losing);
+      highlightWinningMarks(winning);
+    }
+    if (wrapRef.current) animateBoardOut(wrapRef.current);
   }, [outcome]);
 
   return (
-    <div className={styles.boardWrap}>
+    <div className={styles.boardWrap} ref={wrapRef}>
       {/* always rendered so it reserves layout space — hidden when the game ends */}
       <div
         className={`${styles.turn}${outcome.kind === 'ongoing' ? '' : ` ${styles.turnHidden}`}`}

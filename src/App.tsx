@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { Background } from './components/Background';
 import { Brand } from './components/Brand';
 import { DifficultyPicker } from './components/DifficultyPicker';
 import { EndScreen } from './components/EndScreen';
@@ -42,29 +43,36 @@ export function App() {
   }, []);
 
   return (
-    <div className="app">
-      <div className="stage">
-        <div className="stage__top">
-          <Brand />
-          <StatsBar stats={stats} onReset={resetHistory} />
-        </div>
+    <>
+      <Background />
+      <div className="app">
+        <div className="stage">
+          <div className="stage__top">
+            <Brand />
+            <StatsBar stats={stats} onReset={resetHistory} />
+          </div>
 
-        <div className="stage__main">
-          {phase.kind === 'pick' && <DifficultyPicker onConfirm={startGame} />}
+          <div className="stage__main">
+            {phase.kind === 'pick' && <DifficultyPicker onConfirm={startGame} />}
 
-          {phase.kind === 'playing' && (
-            <GameSession
-              key={phase.gameId}
-              difficulty={phase.difficulty}
-              onFinish={result => finishGame(phase.difficulty, result)}
-            />
-          )}
+            {phase.kind === 'playing' && (
+              <GameSession
+                key={phase.gameId}
+                difficulty={phase.difficulty}
+                onFinish={result => finishGame(phase.difficulty, result)}
+              />
+            )}
 
-          {phase.kind === 'finished' && (
-            <EndScreen result={phase.result} difficulty={phase.difficulty} onReplay={startGame} />
-          )}
+            {phase.kind === 'finished' && (
+              <EndScreen
+                result={phase.result}
+                difficulty={phase.difficulty}
+                onReplay={startGame}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
