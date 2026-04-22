@@ -26,6 +26,7 @@
     transform 90ms ease,
     box-shadow 90ms ease,
     background-color 200ms ease;
+  will-change: background-color, box-shadow, color, transform;
   user-select: none;
 }
 

@@ -15,6 +15,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@web-kits/audio": "^0.1.0",
     "animejs": "^4.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

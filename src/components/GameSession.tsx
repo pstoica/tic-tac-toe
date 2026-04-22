@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Board } from './Board';
+import { useGameSounds } from '../audio';
 import { CPU_MARK, HUMAN_MARK } from '../game/constants';
 import { EMPTY_BOARD, evaluate, opposite, play } from '../game/board';
 import { CpuPlayer, HumanPlayer, type Player } from '../game/players';
@@ -16,6 +17,7 @@ interface GameSessionProps {
 export function GameSession({ difficulty, onFinish, onCalculating }: GameSessionProps) {
   const [board, setBoard] = useState<BoardType>(EMPTY_BOARD);
   const [current, setCurrent] = useState<Mark>(HUMAN_MARK);
+  const sounds = useGameSounds();
 
   const players = useMemo<Record<Mark, Player>>(
     () => ({
@@ -33,12 +35,16 @@ export function GameSession({ difficulty, onFinish, onCalculating }: GameSession
   // parent callbacks can re-identify on every render (e.g. an inline arrow
   // around onFinish). keeping them in refs means the end-of-game effect only
   // depends on `outcome`, so it doesn't re-run and clobber its own timer
-  // when App re-renders in the middle of the 1300ms resolving window.
+  // when App re-renders in the middle of the 1300ms resolving window. same
+  // rationale for `sounds`: its identity flips when the audio patch loads,
+  // which would otherwise retrigger the move-lander effect mid-turn.
   const onFinishRef = useRef(onFinish);
   const onCalculatingRef = useRef(onCalculating);
+  const soundsRef = useRef(sounds);
   useEffect(() => {
     onFinishRef.current = onFinish;
     onCalculatingRef.current = onCalculating;
+    soundsRef.current = sounds;
   });
 
   useEffect(() => {
@@ -54,6 +60,7 @@ export function GameSession({ difficulty, onFinish, onCalculating }: GameSession
           return play(prev, idx, current);
         });
         setCurrent(opposite(current));
+        soundsRef.current.place();
       })
       .catch(err => {
         if ((err as Error).name !== 'AbortError') console.error(err);

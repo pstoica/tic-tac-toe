@@ -24,11 +24,13 @@ src/
   main.tsx                entry + global stylesheet
   global.css              palette, resets, stage layout, reduced-motion
   anim.ts                 every anime.js call lives here; components just hand it refs
+  audio.tsx               GameSoundsProvider + useGameSounds hook over @web-kits/audio
   components/
+    Background.tsx        jittered-grid of drifting X/O shapes behind the stage
     Board.tsx             the 3x3 SVG grid + cell hit-testing
-    Brand.tsx             the tic•tac•toe wordmark with the hue wave
+    Brand.tsx             the tic•tac•toe wordmark with the hue wave + calculating flicker
     Button.tsx            shared chunky pressable button (hue / block / ghost variants)
-    DifficultyPicker.tsx  three tilted cards + start button
+    DifficultyPicker.tsx  hue-always-on cards, press-to-play, no separate Start
     EndScreen.tsx         win/loss/draw overlay with character-specific title animations
     GameSession.tsx       per-game state + Player driver loop
     Mark.tsx              X / O with the ghost-particle trail + winning-trio recolor
@@ -59,6 +61,8 @@ src/
 **Layout stability.** The header sits at a fixed top offset and the main area carries a fixed `min-height` sized for the board; swapping picker → game → end screen never shifts anything. The stats pill reserves the reset button's height even when the button is hidden; the stats history strip is a fixed-width overflow container that virtualizes a slot-scroll once you hit 12 entries, with a `flushSync` around the content swap so there's never a frame with the translate reset and the old token still in the DOM.
 
 **Build/test signal.** Game logic, minimax, and the stats reducer are covered by vitest. Tests stay in pure Node (no jsdom) — the stats suite uses a tiny in-memory `localStorage` shim.
+
+**Audio.** Three-event sound layer driven by `@web-kits/audio`'s Crisp patch: `swoosh` when a mark lands (human or CPU), `success` on win, `error` on loss. The Web Audio context is resumed on the first difficulty click (which also plays the first swoosh, so the gesture isn't wasted). Exposed through a small `GameSoundsProvider` / `useGameSounds` pair so the rest of the app doesn't know which patch / sound name backs each event.
 
 ## Trade-offs / what I'd pick up next
 

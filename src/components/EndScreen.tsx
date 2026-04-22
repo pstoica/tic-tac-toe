@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { animateDrawTitle, animateEndCardIn, animateLossTitle, animateWinTitle } from '../anim';
+import { useGameSounds } from '../audio';
 import type { GameResult } from '../game/stats';
 import { DifficultyPicker } from './DifficultyPicker';
 import type { Difficulty } from '../game/types';
@@ -34,11 +35,18 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
   const [showPicker, setShowPicker] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const sounds = useGameSounds();
 
   const chars = useMemo(() => Array.from(TITLES[result]), [result]);
 
   useLayoutEffect(() => {
     if (cardRef.current) animateEndCardIn(cardRef.current);
+    // reveal sound lands with the title anim — success for win, error for
+    // loss, draw stays silent (the EndScreen card is understated already)
+    if (result === 'win') sounds.win();
+    else if (result === 'loss') sounds.lose();
+    // only fire once on mount; `sounds` identity is stable after patch load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
