@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { animate, utils } from 'animejs';
 import type { GameRecord, GameResult, Stats } from '../game/stats';
+import styles from './StatsBar.module.css';
 
 interface StatsBarProps {
   stats: Stats;
@@ -14,18 +15,30 @@ const TOKEN: Record<GameResult, string> = {
   draw: 'D',
 };
 
+const VALUE_CLASS: Record<GameResult, string> = {
+  win:  styles.statsValueWin,
+  loss: styles.statsValueLoss,
+  draw: styles.statsValueDraw,
+};
+
+const TOKEN_CLASS: Record<GameResult, string> = {
+  win:  styles.statsTokenWin,
+  loss: styles.statsTokenLoss,
+  draw: styles.statsTokenDraw,
+};
+
 export function StatsBar({ stats, onReset }: StatsBarProps) {
   const [confirming, setConfirming] = useState(false);
   const hasAny = stats.wins + stats.losses + stats.draws > 0;
 
   if (confirming) {
     return (
-      <div className="stats stats--confirm" role="alertdialog" aria-label="reset history confirmation">
-        <span className="stats__confirm-text">Reset history?</span>
-        <div className="stats__confirm-btns">
+      <div className={`${styles.stats} ${styles.statsConfirm}`} role="alertdialog" aria-label="reset history confirmation">
+        <span className={styles.statsConfirmText}>Reset history?</span>
+        <div className={styles.statsConfirmBtns}>
           <button
             type="button"
-            className="stats__confirm-btn stats__confirm-btn--yes"
+            className={`${styles.statsConfirmBtn} ${styles.statsConfirmBtnYes}`}
             onClick={() => { onReset(); setConfirming(false); }}
             autoFocus
           >
@@ -33,7 +46,7 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
           </button>
           <button
             type="button"
-            className="stats__confirm-btn stats__confirm-btn--no"
+            className={`${styles.statsConfirmBtn} ${styles.statsConfirmBtnNo}`}
             onClick={() => setConfirming(false)}
           >
             No
@@ -46,29 +59,29 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
   const recent = stats.history.slice(-12);
 
   return (
-    <div className="stats" aria-label="win loss record">
-      <div className="stats__group">
-        <span className="stats__label">W</span>
-        <span className="stats__value stats__value--win">{stats.wins}</span>
+    <div className={styles.stats} aria-label="win loss record">
+      <div className={styles.statsGroup}>
+        <span className={styles.statsLabel}>W</span>
+        <span className={`${styles.statsValue} ${VALUE_CLASS.win}`}>{stats.wins}</span>
       </div>
-      <div className="stats__group">
-        <span className="stats__label">L</span>
-        <span className="stats__value stats__value--loss">{stats.losses}</span>
+      <div className={styles.statsGroup}>
+        <span className={styles.statsLabel}>L</span>
+        <span className={`${styles.statsValue} ${VALUE_CLASS.loss}`}>{stats.losses}</span>
       </div>
-      <div className="stats__group">
-        <span className="stats__label">D</span>
-        <span className="stats__value stats__value--draw">{stats.draws}</span>
+      <div className={styles.statsGroup}>
+        <span className={styles.statsLabel}>D</span>
+        <span className={`${styles.statsValue} ${VALUE_CLASS.draw}`}>{stats.draws}</span>
       </div>
       {recent.length > 0 && <StatsStrip recent={recent} />}
       {hasAny && (
         <button
           type="button"
-          className="stats__reset"
+          className={styles.statsReset}
           onClick={() => setConfirming(true)}
           aria-label="reset history"
           title="Reset history"
         >
-          <svg className="stats__reset-icon" viewBox="-6 -6 12 12" aria-hidden="true">
+          <svg className={styles.statsResetIcon} viewBox="-6 -6 12 12" aria-hidden="true">
             <path d="M -3 -3 L 3 3 M 3 -3 L -3 3" />
           </svg>
         </button>
@@ -176,8 +189,8 @@ function StatsStrip({ recent }: StatsStripProps) {
   }, [recent]);
 
   return (
-    <div className="stats__strip" aria-label="recent games">
-      <div className="stats__strip-row" ref={rowRef}>
+    <div className={styles.statsStrip} aria-label="recent games">
+      <div className={styles.statsStripRow} ref={rowRef}>
         {displayed.map(r => (
           <span
             key={r.at}
@@ -185,7 +198,7 @@ function StatsStrip({ recent }: StatsStripProps) {
               if (el) elRefs.current.set(r.at, el);
               else elRefs.current.delete(r.at);
             }}
-            className={`stats__token stats__token--${r.result}`}
+            className={`${styles.statsToken} ${TOKEN_CLASS[r.result]}`}
             title={r.result}
           >
             {TOKEN[r.result]}

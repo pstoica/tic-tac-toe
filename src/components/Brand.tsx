@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { animateBrandHues } from '../anim';
+import styles from './Brand.module.css';
 
 const BRAND_CHARS: ReadonlyArray<{ ch: string; kind: 'letter' | 'dot' }> = [
   { ch: 't', kind: 'letter' },
@@ -23,11 +24,11 @@ export function Brand() {
   }, []);
 
   return (
-    <div className="brand" ref={ref} aria-label="tictactoe">
+    <div className={styles.brand} ref={ref} aria-label="tictactoe">
       {BRAND_CHARS.map((c, i) => (
         <span
           key={i}
-          className={c.kind === 'dot' ? 'brand__dot' : 'brand__letter'}
+          className={c.kind === 'dot' ? styles.brandDot : styles.brandLetter}
           aria-hidden="true"
         >
           {c.kind === 'dot' ? '' : c.ch}

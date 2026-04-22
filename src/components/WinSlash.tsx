@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { animateWinSlash } from '../anim';
+import styles from './WinSlash.module.css';
 
 interface WinSlashProps {
   x1: number;
@@ -32,9 +33,9 @@ export function WinSlash({ x1, y1, x2, y2 }: WinSlashProps) {
   const my = (sy + ey) / 2;
 
   return (
-    <g className="win-slash-group">
-      <line ref={a} className="win-slash" x1={mx} y1={my} x2={sx} y2={sy} />
-      <line ref={b} className="win-slash" x1={mx} y1={my} x2={ex} y2={ey} />
+    <g>
+      <line ref={a} className={styles.winSlash} x1={mx} y1={my} x2={sx} y2={sy} />
+      <line ref={b} className={styles.winSlash} x1={mx} y1={my} x2={ex} y2={ey} />
     </g>
   );
 }

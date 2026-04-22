@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { animatePickerIn } from '../anim';
 import type { Difficulty } from '../game/types';
+import btn from '../styles/buttons.module.css';
+import styles from './DifficultyPicker.module.css';
 
 interface DifficultyPickerProps {
   initial?: Difficulty;
@@ -44,9 +46,9 @@ export function DifficultyPicker({
   const accentHue = OPTIONS.find(o => o.value === selected)?.hue ?? 285;
 
   return (
-    <div className="picker" ref={cardRef}>
-      <h2 className="picker__title">{title}</h2>
-      <div className="picker__options" role="radiogroup" aria-label="difficulty">
+    <div className={styles.picker} ref={cardRef}>
+      <h2 className={styles.pickerTitle}>{title}</h2>
+      <div className={styles.pickerOptions} role="radiogroup" aria-label="difficulty">
         {OPTIONS.map((opt, i) => {
           const isSelected = selected === opt.value;
           return (
@@ -56,19 +58,19 @@ export function DifficultyPicker({
               type="button"
               role="radio"
               aria-checked={isSelected}
-              className={`opt-card${isSelected ? ' opt-card--selected' : ''}`}
+              className={`${styles.optCard}${isSelected ? ` ${styles.optCardSelected}` : ''}`}
               style={{
                 '--accent-hue': opt.hue,
                 '--tilt': `${opt.tilt}deg`,
               } as React.CSSProperties}
               onClick={() => setSelected(opt.value)}
             >
-              <span className="opt-card__name">{opt.name}</span>
-              <span className="opt-card__stars" aria-label={`${opt.stars} of 3`}>
+              <span className={styles.optCardName}>{opt.name}</span>
+              <span className={styles.optCardStars} aria-label={`${opt.stars} of 3`}>
                 {[1, 2, 3].map(n => (
                   <span
                     key={n}
-                    className={`opt-card__star opt-card__star--${n <= opt.stars ? 'on' : 'off'}`}
+                    className={`${styles.optCardStar} ${n <= opt.stars ? styles.optCardStarOn : styles.optCardStarOff}`}
                     aria-hidden="true"
                   >
                     ★
@@ -81,7 +83,7 @@ export function DifficultyPicker({
       </div>
       <button
         type="button"
-        className="btn btn--block"
+        className={`${btn.btn} ${btn.btnBlock}`}
         style={{ '--btn-hue': accentHue } as React.CSSProperties}
         onClick={() => onConfirm(selected)}
       >

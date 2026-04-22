@@ -1,0 +1,101 @@
+/* hand-placed cards with stars and wonky tilt */
+
+.picker {
+  width: 100%;
+  display: grid;
+  gap: 22px;
+}
+
+.picker__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.picker__options {
+  display: grid;
+  gap: 14px;
+  /* room for the tilted cards to breathe without being clipped */
+  padding: 6px 4px;
+}
+
+.opt-card {
+  --accent-hue: 285;
+  --tilt: 0deg;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: oklch(22% 0.04 285);
+  border: 2px solid oklch(30% 0.04 285);
+  box-shadow:
+    0 5px 0 oklch(10% 0.02 285),
+    0 12px 18px -8px oklch(0% 0 0 / 0.5);
+  text-align: left;
+  transform: rotate(var(--tilt));
+  transition: transform 160ms cubic-bezier(.3, 1.4, .5, 1), border-color 140ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+/* rotate exaggerates (hit area stays roughly the same since rotation is around
+   the card's center); no translateY since the bottom solid shadow would
+   otherwise sit in a dead zone between original and hover positions */
+.opt-card:hover:not(.opt-card--selected) {
+  transform: rotate(calc(var(--tilt) * 1.6));
+  border-color: oklch(78% 0.16 var(--accent-hue));
+}
+
+.opt-card:focus-visible {
+  outline: none;
+  border-color: oklch(88% 0.15 var(--accent-hue));
+  box-shadow:
+    0 5px 0 oklch(10% 0.02 285),
+    0 0 0 3px oklch(88% 0.15 var(--accent-hue) / 0.4);
+}
+
+.opt-card--selected {
+  transform: rotate(0deg) translateY(-3px) scale(1.02);
+  background: oklch(58% 0.21 var(--accent-hue));
+  border-color: oklch(90% 0.15 var(--accent-hue));
+  color: oklch(12% 0.04 var(--accent-hue));
+  box-shadow:
+    0 7px 0 oklch(30% 0.14 var(--accent-hue)),
+    0 0 26px oklch(80% 0.18 var(--accent-hue) / 0.55);
+}
+
+.opt-card__name {
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.opt-card__stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.opt-card__star {
+  color: oklch(35% 0.03 285);
+  transition: color 160ms ease, text-shadow 160ms ease;
+}
+
+.opt-card__star--on {
+  color: oklch(85% 0.18 var(--accent-hue));
+  text-shadow: 0 0 10px oklch(85% 0.18 var(--accent-hue) / 0.65);
+}
+
+.opt-card--selected .opt-card__star--off {
+  color: oklch(35% 0.1 var(--accent-hue) / 0.6);
+}
+
+.opt-card--selected .opt-card__star--on {
+  color: oklch(98% 0.08 var(--accent-hue));
+  text-shadow: 0 0 14px oklch(98% 0.08 var(--accent-hue) / 0.95);
+}

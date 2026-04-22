@@ -3,6 +3,7 @@ import { animateBoardIn, dimNonWinningMarks, highlightWinningMarks } from '../an
 import type { Board as BoardType, Mark as MarkType, Outcome } from '../game/types';
 import { Mark } from './Mark';
 import { WinSlash } from './WinSlash';
+import styles from './Board.module.css';
 
 interface BoardProps {
   board: BoardType;
@@ -55,16 +56,16 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
   }, [outcome]);
 
   return (
-    <div className="board-wrap">
+    <div className={styles.boardWrap}>
       {/* always rendered so it reserves layout space — hidden when the game ends */}
       <div
-        className={`turn${outcome.kind === 'ongoing' ? '' : ' turn--hidden'}`}
+        className={`${styles.turn}${outcome.kind === 'ongoing' ? '' : ` ${styles.turnHidden}`}`}
         style={{ '--turn-hue': current === 'X' ? 25 : 235 } as React.CSSProperties}
         aria-live="polite"
         aria-hidden={outcome.kind !== 'ongoing'}
       >
-        <span className="turn__token" aria-hidden="true">
-          <svg className="turn__glyph" viewBox="-10 -10 20 20">
+        <span className={styles.turnToken} aria-hidden="true">
+          <svg className={styles.turnGlyph} viewBox="-10 -10 20 20">
             {current === 'X' ? (
               <path d="M -5 -5 L 5 5 M 5 -5 L -5 5" />
             ) : (
@@ -75,7 +76,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         {busy ? (
           <>
             CPU
-            <span className="turn__dots" aria-hidden="true">
+            <span className={styles.turnDots} aria-hidden="true">
               <span /><span /><span />
             </span>
           </>
@@ -83,7 +84,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
           <>YOUR TURN</>
         )}
       </div>
-      <svg className="board" viewBox={`0 0 ${VIEW} ${VIEW}`} role="grid" aria-label="tic tac toe board">
+      <svg className={styles.board} viewBox={`0 0 ${VIEW} ${VIEW}`} role="grid" aria-label="tic tac toe board">
         {/* cells */}
         {Array.from({ length: 9 }, (_, i) => {
           const x = (i % 3) * CELL;
@@ -96,7 +97,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               ref={el => { cellRefs.current[i] = el; }}
             >
               <rect
-                className="cell-bg"
+                className={styles.cellBg}
                 x={x + 6}
                 y={y + 6}
                 rx={10}
@@ -106,7 +107,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               />
               {!disabled && (
                 <rect
-                  className="cell-hit"
+                  className={styles.cellHit}
                   x={x}
                   y={y}
                   width={CELL}
@@ -128,10 +129,10 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         })}
 
         {/* grid lines — full span of the viewBox */}
-        <line ref={el => { gridRefs.current[0] = el; }} className="board__grid-line" x1={CELL} y1={0} x2={CELL} y2={VIEW} />
-        <line ref={el => { gridRefs.current[1] = el; }} className="board__grid-line" x1={CELL * 2} y1={0} x2={CELL * 2} y2={VIEW} />
-        <line ref={el => { gridRefs.current[2] = el; }} className="board__grid-line" x1={0} y1={CELL} x2={VIEW} y2={CELL} />
-        <line ref={el => { gridRefs.current[3] = el; }} className="board__grid-line" x1={0} y1={CELL * 2} x2={VIEW} y2={CELL * 2} />
+        <line ref={el => { gridRefs.current[0] = el; }} className={styles.boardGridLine} x1={CELL} y1={0} x2={CELL} y2={VIEW} />
+        <line ref={el => { gridRefs.current[1] = el; }} className={styles.boardGridLine} x1={CELL * 2} y1={0} x2={CELL * 2} y2={VIEW} />
+        <line ref={el => { gridRefs.current[2] = el; }} className={styles.boardGridLine} x1={0} y1={CELL} x2={VIEW} y2={CELL} />
+        <line ref={el => { gridRefs.current[3] = el; }} className={styles.boardGridLine} x1={0} y1={CELL * 2} x2={VIEW} y2={CELL * 2} />
 
         {/* marks — each wrapped in its own nested <svg> with overflow:hidden
             so its viewport clips anything outside the tile (ghost particle
@@ -153,7 +154,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               viewBox={`0 0 ${inner} ${inner}`}
               style={{ overflow: 'hidden' }}
             >
-              <g ref={el => { markRefs.current[i] = el; }} className="mark-cell">
+              <g ref={el => { markRefs.current[i] = el; }} className={styles.markCell}>
                 <Mark mark={cell} cx={center} cy={center} size={52} />
               </g>
             </svg>

@@ -1,0 +1,93 @@
+/* ============================================================
+   palette — dark base + saturated pastels via oklch
+   no multi-stop gradients; hue shifts happen in motion
+   ============================================================ */
+
+:root {
+  --bg: oklch(12% 0.02 280);
+  --bg-deep: oklch(8% 0.025 280);
+  --surface: oklch(18% 0.03 285);
+  --surface-2: oklch(22% 0.04 285);
+  --border: oklch(32% 0.04 285 / 0.55);
+
+  --ink: oklch(98% 0.01 280);
+  --ink-dim: oklch(76% 0.02 280);
+  --ink-mute: oklch(52% 0.02 280);
+
+  --x-color: oklch(82% 0.16 25);
+  --o-color: oklch(82% 0.16 235);
+  --win-color: oklch(88% 0.18 145);
+
+  --radius: 16px;
+  --radius-lg: 22px;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family:
+    ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  background:
+    radial-gradient(1000px 600px at 50% -10%, oklch(22% 0.06 280 / 0.55), transparent 70%),
+    radial-gradient(700px 500px at 50% 110%, oklch(20% 0.06 320 / 0.45), transparent 70%),
+    var(--bg-deep);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ============================================================
+   layout — centered mobile-like stage.
+   header is anchored near the top of the viewport; main content lives in a
+   fixed-height area below the centerfold so swapping picker → board → end
+   never shifts the header.
+   ============================================================ */
+
+.app {
+  min-height: 100vh;
+  padding: 7vh 20px 4vh;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+}
+
+.stage {
+  width: 100%;
+  max-width: 440px;
+  display: grid;
+  align-content: start;
+  gap: clamp(32px, 6vh, 56px);
+  justify-items: center;
+}
+
+.stage__top {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.stage__main {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  /* sized for the board + turn pill so it never shrinks back to picker size */
+  min-height: clamp(460px, 58vh, 520px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

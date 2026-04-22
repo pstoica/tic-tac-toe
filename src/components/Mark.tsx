@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { animateMarkGhosts, animateMarkGrow, GHOST_COUNT } from '../anim';
 import type { Mark as MarkType } from '../game/types';
+import styles from './Mark.module.css';
 
 interface MarkProps {
   mark: MarkType;
@@ -18,7 +19,6 @@ const MARK_PATH = (mark: MarkType, cx: number, cy: number, s: number): string =>
   return `M ${cx - h} ${cy - h} L ${cx + h} ${cy + h} M ${cx + h} ${cy - h} L ${cx - h} ${cy + h}`;
 };
 
-
 export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
   const groupRef = useRef<SVGGElement>(null);
   const ghostRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -30,15 +30,16 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
   }, []);
 
   const d = MARK_PATH(mark, cx, cy, size);
+  const variantClass = mark === 'X' ? styles.markX : styles.markO;
 
   return (
-    <g className={`mark mark--${mark}`}>
-      <g className="mark-ghosts">
+    <g className={`${styles.mark} ${variantClass}`}>
+      <g className={styles.markGhosts}>
         {Array.from({ length: GHOST_COUNT }, (_, i) => (
           <path
             key={i}
             ref={el => { ghostRefs.current[i] = el; }}
-            className="mark__ghost"
+            className={styles.markGhost}
             d={d}
             style={{ '--ghost-hue': (i * (360 / GHOST_COUNT)) % 360 } as React.CSSProperties}
           />
@@ -46,8 +47,8 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
       </g>
       {/* only the primary shape receives the grow animation — scaling the
           outer group would also scale the ghosts past the clip boundary */}
-      <g ref={groupRef} className="mark-primary">
-        <path className="mark__path" d={d} />
+      <g ref={groupRef} className={styles.markPrimary}>
+        <path className={styles.markPath} d={d} />
       </g>
     </g>
   );

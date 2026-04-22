@@ -8,6 +8,8 @@ import {
 import type { GameResult } from '../game/stats';
 import { DifficultyPicker } from './DifficultyPicker';
 import type { Difficulty } from '../game/types';
+import btn from '../styles/buttons.module.css';
+import styles from './EndScreen.module.css';
 
 interface EndScreenProps {
   result: GameResult;
@@ -25,6 +27,12 @@ const HUE_FOR_RESULT: Record<GameResult, number> = {
   win: 145,
   loss: 25,
   draw: 275,
+};
+
+const VARIANT_CLASS: Record<GameResult, string> = {
+  win:  styles.endWin,
+  loss: styles.endLoss,
+  draw: styles.endDraw,
 };
 
 export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
@@ -48,7 +56,7 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
 
   if (showPicker) {
     return (
-      <div className="end" role="dialog" aria-modal="true" aria-label="choose next opponent">
+      <div className={styles.end} role="dialog" aria-modal="true" aria-label="choose next opponent">
         <DifficultyPicker
           initial={difficulty}
           title="Pick your next opponent"
@@ -62,29 +70,29 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
   const accentHue = HUE_FOR_RESULT[result];
 
   return (
-    <div className={`end end--${result}`} role="dialog" aria-modal="true" aria-label={TITLES[result]}>
-      <div className="end__card" ref={cardRef}>
-        <h2 className="end__title" aria-label={TITLES[result]}>
+    <div className={`${styles.end} ${VARIANT_CLASS[result]}`} role="dialog" aria-modal="true" aria-label={TITLES[result]}>
+      <div className={styles.endCard} ref={cardRef}>
+        <h2 className={styles.endTitle} aria-label={TITLES[result]}>
           {chars.map((ch, i) => (
             <span
               key={i}
               ref={el => { charRefs.current[i] = el; }}
-              className="end__char"
+              className={styles.endChar}
               aria-hidden="true"
             >
-              {ch === ' ' ? ' ' : ch}
+              {ch === ' ' ? ' ' : ch}
             </span>
           ))}
         </h2>
-        <p className="end__sub">
+        <p className={styles.endSub}>
           {result === 'win'  && 'clean line — run it back?'}
           {result === 'loss' && 'tough one — try again'}
           {result === 'draw' && 'dead even — rematch?'}
         </p>
-        <div className="end__actions">
+        <div className={styles.endActions}>
           <button
             type="button"
-            className="btn btn--block"
+            className={`${btn.btn} ${btn.btnBlock}`}
             style={{ '--btn-hue': accentHue } as React.CSSProperties}
             onClick={() => onReplay(difficulty)}
             autoFocus
@@ -93,7 +101,7 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
           </button>
           <button
             type="button"
-            className="btn btn--block btn--ghost"
+            className={`${btn.btn} ${btn.btnBlock} ${btn.btnGhost}`}
             onClick={() => setShowPicker(true)}
           >
             Change difficulty
