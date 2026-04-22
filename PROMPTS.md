@@ -217,3 +217,33 @@ A running log of prompts supplied during this interview-project build.
 ## Prompt 31 — 2026-04-22
 
 > feels pretty good. anything we should standardize before submitting? more modular CSS approach so its not in one file, refactoring anything else? do an architectural review and write an outline? commit before continuing.
+
+---
+
+## Prompt 32 — 2026-04-22
+
+> can we make the stats row kinda scroll in the new entry and bump out the oldest one? hard to see the shift right now
+
+---
+
+## Prompt 33 — 2026-04-22
+
+> hmm the width of the whole stats row changes while this is happening
+
+---
+
+## Prompt 34 — 2026-04-22
+
+> no just make the list of stats its own overflow container or use simple virtualization. im expecting fades for the exit and the entrance.
+
+---
+
+## Prompt 35 — 2026-04-22
+
+> this is cutting off the last element.. i also see a brief flicker after the new one slides in
+
+---
+
+## Prompt 36 — 2026-04-22
+
+> the W is cut off, assuming from trying to use mono character widths. consider tabular text or something making them all a tad wider to fit

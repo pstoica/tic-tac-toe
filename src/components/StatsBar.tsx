@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import type { GameResult, Stats } from '../game/stats';
+import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { animate, utils } from 'animejs';
+import type { GameRecord, GameResult, Stats } from '../game/stats';
 
 interface StatsBarProps {
   stats: Stats;
@@ -14,7 +16,6 @@ const TOKEN: Record<GameResult, string> = {
 
 export function StatsBar({ stats, onReset }: StatsBarProps) {
   const [confirming, setConfirming] = useState(false);
-  const recent = stats.history.slice(-12);
   const hasAny = stats.wins + stats.losses + stats.draws > 0;
 
   if (confirming) {
@@ -42,6 +43,8 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
     );
   }
 
+  const recent = stats.history.slice(-12);
+
   return (
     <div className="stats" aria-label="win loss record">
       <div className="stats__group">
@@ -56,19 +59,7 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
         <span className="stats__label">D</span>
         <span className="stats__value stats__value--draw">{stats.draws}</span>
       </div>
-      {recent.length > 0 && (
-        <div className="stats__strip" aria-label="recent games">
-          {recent.map((r, i) => (
-            <span
-              key={i}
-              className={`stats__token stats__token--${r.result}`}
-              title={r.result}
-            >
-              {TOKEN[r.result]}
-            </span>
-          ))}
-        </div>
-      )}
+      {recent.length > 0 && <StatsStrip recent={recent} />}
       {hasAny && (
         <button
           type="button"
@@ -82,6 +73,125 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
           </svg>
         </button>
       )}
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------
+   StatsStrip
+   Fixed-width overflow container; simple virtualization.
+   The inner row holds the full set of tokens and shifts left
+   by one slot when the cap is hit, so the oldest slides out
+   the left edge while the new one slides in from the right —
+   each with a straight fade. Pre-cap adds just fade in place.
+   --------------------------------------------------------- */
+
+interface StatsStripProps {
+  recent: GameRecord[];
+}
+
+const TOKEN_STEP = 16;   // token width (12px) + gap (4px)
+const DURATION   = 340;
+const EASE       = 'outQuart';
+
+function StatsStrip({ recent }: StatsStripProps) {
+  const [displayed, setDisplayed] = useState<GameRecord[]>(recent);
+  const elRefs = useRef(new Map<string, HTMLSpanElement>());
+  const rowRef = useRef<HTMLDivElement>(null);
+  const prevRef = useRef<GameRecord[]>(recent);
+
+  useEffect(() => {
+    const prev = prevRef.current;
+    prevRef.current = recent;
+
+    if (prev.length === recent.length && prev.every((p, i) => p.at === recent[i]?.at)) {
+      return;
+    }
+
+    const prevAt = new Set(prev.map(p => p.at));
+    const recentAt = new Set(recent.map(r => r.at));
+    const newEntry = recent.find(r => !prevAt.has(r.at));
+    const oldEntry = prev.find(p => !recentAt.has(p.at));
+
+    if (!newEntry) {
+      // reset, or some other backfill — snap to whatever recent is now
+      setDisplayed(recent);
+      return;
+    }
+
+    if (oldEntry) {
+      // keep the outgoing token in the DOM (at slot 0) while it slides out.
+      // the row's own translateX handles the virtualization scroll; the
+      // container clips anything past its edges.
+      setDisplayed([oldEntry, ...recent]);
+    } else {
+      setDisplayed(recent);
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const row = rowRef.current;
+      const newEl = elRefs.current.get(newEntry.at);
+      const oldEl = oldEntry ? elRefs.current.get(oldEntry.at) : null;
+
+      if (oldEntry && row && oldEl && newEl) {
+        // parallel: row scrolls one slot left, old fades out as it exits
+        // the left edge, new fades in as it enters from the right edge
+        utils.set(row, { translateX: 0 });
+        animate(row, {
+          translateX: [0, -TOKEN_STEP],
+          duration: DURATION,
+          ease: EASE,
+          onComplete: () => {
+            // flushSync the content swap *before* unwinding the translate,
+            // so in a single paint the row has 12 items AND translateX: 0.
+            // otherwise there's one frame where translateX = 0 but 13
+            // items are still in the DOM and the 13th clips past the edge.
+            flushSync(() => {
+              setDisplayed(recent);
+            });
+            utils.set(row, { translateX: 0 });
+          },
+        });
+        animate(oldEl, {
+          opacity: [1, 0],
+          duration: DURATION,
+          ease: EASE,
+        });
+        animate(newEl, {
+          opacity: [0, 1],
+          duration: DURATION,
+          ease: EASE,
+        });
+      } else if (newEl) {
+        // pre-cap append — just fade in at its natural flex slot
+        animate(newEl, {
+          opacity: [0, 1],
+          duration: DURATION,
+          ease: EASE,
+        });
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [recent]);
+
+  return (
+    <div className="stats__strip" aria-label="recent games">
+      <div className="stats__strip-row" ref={rowRef}>
+        {displayed.map(r => (
+          <span
+            key={r.at}
+            ref={el => {
+              if (el) elRefs.current.set(r.at, el);
+              else elRefs.current.delete(r.at);
+            }}
+            className={`stats__token stats__token--${r.result}`}
+            title={r.result}
+          >
+            {TOKEN[r.result]}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

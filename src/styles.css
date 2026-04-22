@@ -250,20 +250,39 @@ button {
 .stats__value--loss { color: oklch(82% 0.18 25); }
 .stats__value--draw { color: var(--ink-dim); }
 
+/* fixed-width overflow container so the pill doesn't pulse when the row
+   is transitioning an entry in/out. the inner row is what gets translated
+   during a slot-scroll; anything past the container edge is clipped. */
 .stats__strip {
-  display: inline-flex;
-  gap: 4px;
+  display: inline-block;
   margin-left: 6px;
+  overflow: hidden;
+  /* sized for 12 tokens @ 12px + 11 gaps @ 4px */
+  max-width: 188px;
   font-weight: 900;
   font-size: 12px;
   letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stats__strip-row {
+  display: inline-flex;
+  gap: 4px;
+  /* never shrink: we want overflow, not compression, when the row
+     briefly holds 13 tokens during a transition */
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .stats__token {
-  min-width: 9px;
+  /* pinned width so the scroll-step math (16 = 12 + 4 gap) is precise
+     regardless of glyph metrics — W is the widest at ~11px, so 12px gives
+     a little breathing room; L/D get centered with the slack */
+  width: 12px;
   text-align: center;
   line-height: 1;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .stats__token--win  { color: oklch(86% 0.16 145); }
