@@ -51,6 +51,8 @@ export class CpuPlayer implements Player {
     readonly mark: Mark,
     readonly difficulty: Difficulty,
     private readonly thinkMs = 450,
+    /** +/- jitter around thinkMs so the CPU doesn't feel metronomic */
+    private readonly thinkJitterMs = 160,
   ) {}
 
   chooseMove(board: Board, signal: AbortSignal): Promise<number> {
@@ -60,7 +62,9 @@ export class CpuPlayer implements Player {
         return;
       }
       const move = pickByDifficulty(board, this.mark, this.difficulty);
-      const t = window.setTimeout(() => resolve(move), this.thinkMs);
+      const jitter = (Math.random() * 2 - 1) * this.thinkJitterMs;
+      const delay = Math.max(150, this.thinkMs + jitter);
+      const t = window.setTimeout(() => resolve(move), delay);
       signal.addEventListener(
         'abort',
         () => {

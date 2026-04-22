@@ -60,7 +60,8 @@ export function GameSession({ difficulty, onFinish, onCalculating }: GameSession
           return play(prev, idx, current);
         });
         setCurrent(opposite(current));
-        soundsRef.current.place();
+        if (player.kind === 'cpu') soundsRef.current.placeCpu();
+        else soundsRef.current.placeHuman();
       })
       .catch(err => {
         if ((err as Error).name !== 'AbortError') console.error(err);

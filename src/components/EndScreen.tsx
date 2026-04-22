@@ -41,10 +41,10 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
 
   useLayoutEffect(() => {
     if (cardRef.current) animateEndCardIn(cardRef.current);
-    // reveal sound lands with the title anim — success for win, error for
-    // loss, draw stays silent (the EndScreen card is understated already)
+    // reveal sound lands with the title anim
     if (result === 'win') sounds.win();
     else if (result === 'loss') sounds.lose();
+    else sounds.draw();
     // only fire once on mount; `sounds` identity is stable after patch load
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -95,10 +95,25 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
           {result === 'draw' && 'dead even — rematch?'}
         </p>
         <div className={styles.endActions}>
-          <Button block hue={accentHue} onClick={() => onReplay(difficulty)} autoFocus>
+          <Button
+            block
+            hue={accentHue}
+            onClick={() => {
+              sounds.button();
+              onReplay(difficulty);
+            }}
+            autoFocus
+          >
             Play again
           </Button>
-          <Button block ghost onClick={() => setShowPicker(true)}>
+          <Button
+            block
+            ghost
+            onClick={() => {
+              sounds.button();
+              setShowPicker(true);
+            }}
+          >
             Change difficulty
           </Button>
         </div>

@@ -5,19 +5,27 @@ import crispPatch from '../.web-kits/crisp.json';
 
 /* Thin wrapper over @web-kits/audio so the rest of the app doesn't have to
    know which patch / sound name backs each event. The patch is loaded once
-   at the provider and exposed as named triggers; consumers just call
-   sounds.place() / sounds.win() / sounds.lose(). */
+   at the provider and exposed as named triggers. */
 
 export interface GameSounds {
-  place: () => void;
+  /** generic UI button / card press */
+  button: () => void;
+  /** human player's mark landing on the board */
+  placeHuman: () => void;
+  /** CPU's mark landing on the board — deliberately softer than placeHuman */
+  placeCpu: () => void;
   win: () => void;
   lose: () => void;
+  draw: () => void;
 }
 
 const NOOP: GameSounds = {
-  place: () => {},
+  button: () => {},
+  placeHuman: () => {},
+  placeCpu: () => {},
   win: () => {},
   lose: () => {},
+  draw: () => {},
 };
 
 const GameSoundsContext = createContext<GameSounds>(NOOP);
@@ -28,14 +36,28 @@ function SoundsInner({ children }: { children: ReactNode }) {
 
   const value = useMemo<GameSounds>(
     () => ({
-      place: () => {
-        if (patch.ready) patch.play('swoosh');
+      // 'click' is a clean UI tap — used for picker cards + EndScreen buttons
+      button: () => {
+        if (patch.ready) patch.play('click');
+      },
+      // 'pop' has more body + attack — the player's piece feels committed
+      placeHuman: () => {
+        if (patch.ready) patch.play('pop');
+      },
+      // 'tap' is very short + subdued — cpu feels more matter-of-fact
+      placeCpu: () => {
+        if (patch.ready) patch.play('tap');
       },
       win: () => {
         if (patch.ready) patch.play('success');
       },
       lose: () => {
         if (patch.ready) patch.play('error');
+      },
+      // 'info' — neutral informational tone, reads as "noted" rather than
+      // good or bad, which fits a draw better than success/error/notification
+      draw: () => {
+        if (patch.ready) patch.play('info');
       },
     }),
     [patch],

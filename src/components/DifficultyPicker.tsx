@@ -44,7 +44,7 @@ export function DifficultyPicker({
     // can actually produce sound. fire and forget; the play below will
     // silently no-op if the context isn't ready yet.
     ensureReady();
-    sounds.place();
+    sounds.button();
     const opts = optionRefs.current.filter((o): o is HTMLButtonElement => !!o);
     await animatePickerOut(cardRef.current, opts);
     onConfirm(value);
