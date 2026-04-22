@@ -41,7 +41,19 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
   const [showPicker, setShowPicker] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const actionRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const sounds = useGameSounds();
+
+  const onActionKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, i: number) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      actionRefs.current[(i + 1) % actionRefs.current.length]?.focus();
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const len = actionRefs.current.length;
+      actionRefs.current[(i - 1 + len) % len]?.focus();
+    }
+  };
 
   const chars = useMemo(() => Array.from(TITLES[result]), [result]);
 
@@ -102,6 +114,9 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
         </p>
         <div className={styles.endActions}>
           <Button
+            ref={el => {
+              actionRefs.current[0] = el;
+            }}
             block
             hue={accentHue}
             onClick={async () => {
@@ -109,17 +124,22 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
               if (cardRef.current) await animateEndCardOut(cardRef.current);
               onReplay(difficulty);
             }}
+            onKeyDown={e => onActionKeyDown(e, 0)}
             autoFocus
           >
             Play again
           </Button>
           <Button
+            ref={el => {
+              actionRefs.current[1] = el;
+            }}
             block
             ghost
             onClick={() => {
               sounds.button();
               setShowPicker(true);
             }}
+            onKeyDown={e => onActionKeyDown(e, 1)}
           >
             Change difficulty
           </Button>

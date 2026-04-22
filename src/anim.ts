@@ -297,6 +297,10 @@ export function animateBrandCalculating(containerEl: HTMLElement): () => void {
 
 /* ---------- picker entrance / exit ---------- */
 
+// held back long enough for the #root page fade-in (520ms) to settle before
+// the picker's own stagger kicks in, so the two entrances don't overlap.
+const PICKER_ENTER_DELAY = 440;
+
 export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
   if (prefersReducedMotion()) return;
   utils.set(cardEl, { opacity: 0, translateY: 8 });
@@ -305,13 +309,14 @@ export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
     opacity: [0, 1],
     translateY: [8, 0],
     duration: 220,
+    delay: PICKER_ENTER_DELAY,
     ease: 'outQuart',
   });
   animate(optionEls, {
     opacity: [0, 1],
     translateX: [-6, 0],
     duration: 180,
-    delay: stagger(28, { start: 60 }),
+    delay: stagger(28, { start: PICKER_ENTER_DELAY + 60 }),
     ease: 'outQuart',
     // anime.js leaves the final frame's transform inline, which outranks
     // .btn:active's translateY in CSS and makes the press look dead. drop
