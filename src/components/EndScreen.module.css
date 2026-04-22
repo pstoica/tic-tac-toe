@@ -66,4 +66,11 @@
 .end__actions {
   display: grid;
   gap: 10px;
+  /* own compositor layer — without this, the looping translateY/rotate
+     on .end__char (above) triggers a rasterization pass on the whole
+     endCard each frame, which is what makes the buttons flicker.
+     `will-change: transform` is a hint the browser can ignore when
+     there's nothing actually scheduled to transform; translate3d(0,0,0)
+     forces a dedicated layer right away. */
+  transform: translate3d(0, 0, 0);
 }
