@@ -9,19 +9,15 @@
   padding: 8px;
 }
 
+/* no card chrome — title + actions stand on their own against the page,
+   the background X/O shapes show through where the card used to be */
 .end__card {
   width: 100%;
   max-width: 420px;
   display: grid;
   gap: 20px;
   padding: 28px 22px;
-  border-radius: var(--radius-lg);
-  background: oklch(14% 0.03 285 / 0.92);
-  border: 1px solid var(--border);
   text-align: center;
-  box-shadow:
-    0 8px 0 oklch(8% 0.02 285),
-    0 30px 60px -20px oklch(0% 0 0 / 0.65);
 }
 
 .end__title {
