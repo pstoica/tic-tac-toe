@@ -11,7 +11,7 @@
 }
 
 .board {
-  --size: min(72vmin, 420px);
+  --size: min(88vmin, 420px);
   width: var(--size);
   height: var(--size);
   display: block;

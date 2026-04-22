@@ -97,7 +97,7 @@ button {
   place-items: center;
   position: relative;
   /* sized for the board + turn pill so it never shrinks back to picker size */
-  min-height: clamp(460px, 58vh, 520px);
+  min-height: clamp(460px, 58vh, 480px);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -12,6 +12,8 @@
   font-weight: 900;
   letter-spacing: 0.01em;
   text-align: center;
+  text-transform: uppercase;
+  color: var(--ink-dim)
 }
 
 .picker__options {
@@ -32,13 +34,6 @@
 .opt-card:focus-visible {
   outline: 3px solid oklch(92% 0.15 var(--accent-hue));
   outline-offset: 3px;
-}
-
-.opt-card__name {
-  font-weight: 900;
-  font-size: 22px;
-  letter-spacing: 0.01em;
-  line-height: 1;
 }
 
 .opt-card__stars {

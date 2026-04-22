@@ -23,8 +23,9 @@ const irand = (min: number, max: number): number => Math.round(rand(min, max));
    board entrance — staggered, from center, with spectrum sweep
    ============================================================ */
 
-export function animateBoardIn(cellEls: SVGGElement[], gridLineEls: SVGLineElement[]) {
+export function animateBoardIn(turnBadge: HTMLDivElement, cellEls: SVGGElement[], gridLineEls: SVGLineElement[]) {
   if (prefersReducedMotion()) {
+    turnBadge.style.opacity = '1';
     cellEls.forEach(el => {
       el.style.opacity = '1';
     });
@@ -34,8 +35,14 @@ export function animateBoardIn(cellEls: SVGGElement[], gridLineEls: SVGLineEleme
     return;
   }
 
+  utils.set(turnBadge, { opacity: 0 });
   utils.set(cellEls, { opacity: 0, scale: 0.55, rotate: -10 });
   utils.set(gridLineEls, { opacity: 0 });
+
+  animate(turnBadge, {
+    opacity: [0, 1],
+    delay: 500,
+  });
 
   animate(cellEls, {
     opacity: [0, 1],

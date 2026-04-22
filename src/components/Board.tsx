@@ -16,15 +16,17 @@ const VIEW = 300;
 const CELL = VIEW / 3;
 
 export function Board({ board, outcome, current, busy, onCellClick }: BoardProps) {
+  const turnBadgeRef = useRef<(HTMLDivElement | null)>(null);
   const cellRefs = useRef<(SVGGElement | null)[]>([]);
   const gridRefs = useRef<(SVGLineElement | null)[]>([]);
   const markRefs = useRef<(SVGGElement | null)[]>([]);
 
   // mount: stagger the cells in
   useLayoutEffect(() => {
+    if (!turnBadgeRef.current) return;
     const cells = cellRefs.current.filter((c): c is SVGGElement => !!c);
     const lines = gridRefs.current.filter((c): c is SVGLineElement => !!c);
-    animateBoardIn(cells, lines);
+    animateBoardIn(turnBadgeRef.current, cells, lines);
   }, []);
 
   const winningSet = outcome.kind === 'win' ? new Set<number>(outcome.line) : null;
@@ -51,6 +53,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
         style={{ '--turn-hue': current === 'X' ? 25 : 235 } as React.CSSProperties}
         aria-live="polite"
         aria-hidden={outcome.kind !== 'ongoing'}
+        ref={turnBadgeRef}
       >
         <span className={styles.turnToken} aria-hidden="true">
           <svg className={styles.turnGlyph} viewBox="-10 -10 20 20">
