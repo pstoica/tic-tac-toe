@@ -185,8 +185,14 @@ function StatsStrip({ recent }: StatsStripProps) {
     return () => cancelAnimationFrame(frame);
   }, [recent]);
 
+  // visible width = visible token count × slot step − trailing gap. clamped
+  // at 12 because during the cap transition `displayed` briefly carries 13
+  // entries (the outgoing one), and the strip should hold its 188px ceiling.
+  const visibleCount = Math.min(displayed.length, 12);
+  const stripWidth = Math.max(0, visibleCount * TOKEN_STEP - 4);
+
   return (
-    <div className={styles.statsStrip} aria-label="recent games">
+    <div className={styles.statsStrip} style={{ width: `${stripWidth}px` }} aria-label="recent games">
       <div className={styles.statsStripRow} ref={rowRef}>
         {displayed.map(r => (
           <span

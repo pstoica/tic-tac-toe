@@ -131,19 +131,19 @@
   color: var(--ink-dim);
 }
 
-/* fixed-width overflow container so the pill doesn't pulse when the row
-   is transitioning an entry in/out. the inner row is what gets translated
-   during a slot-scroll; anything past the container edge is clipped. */
+/* overflow container — width is set inline by StatsBar based on the
+   visible token count (clamped at 12), so it expands smoothly as new
+   history comes in below the cap, then sits at 188px once the slot-
+   scroll takes over. anything past the container edge is clipped. */
 .stats__strip {
   display: inline-block;
   margin-left: 6px;
   overflow: hidden;
-  /* sized for 12 tokens @ 12px + 11 gaps @ 4px */
-  max-width: 188px;
   font-weight: 900;
   font-size: 12px;
   letter-spacing: 0;
   line-height: 1;
+  transition: width 340ms cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .stats__strip-row {

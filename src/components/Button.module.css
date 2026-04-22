@@ -12,10 +12,9 @@
   background: oklch(62% 0.19 var(--btn-hue));
   color: oklch(14% 0.05 var(--btn-hue));
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   font-size: 22px;
-  letter-spacing: 0.01em;
   line-height: 1;
   box-shadow:
     0 6px 0 oklch(36% 0.12 var(--btn-hue)),
@@ -26,7 +25,11 @@
     transform 90ms ease,
     box-shadow 90ms ease,
     background-color 200ms ease;
-  will-change: background-color, box-shadow, color, transform;
+  /* hard layer promotion via 3D transform — keeps the button on its own
+     compositor layer and stable subpixel AA when sibling animations
+     (e.g. EndScreen's looping title) repaint nearby. `will-change` is a
+     hint the browser can ignore; translateZ(0) is a guarantee. */
+  transform: translateZ(0);
   user-select: none;
 }
 
@@ -39,7 +42,8 @@
 }
 
 .btn:active {
-  transform: translateY(4px);
+  /* keep translateZ(0) so the layer stays put across the transition */
+  transform: translateZ(0) translateY(4px);
   box-shadow:
     0 2px 0 oklch(36% 0.12 var(--btn-hue)),
     0 6px 10px oklch(0% 0 0 / 0.35),
@@ -69,7 +73,7 @@
 }
 
 .btn--ghost:active {
-  transform: translateY(3px);
+  transform: translateZ(0) translateY(3px);
   box-shadow:
     0 2px 0 oklch(10% 0.02 285),
     inset 0 1px 0 oklch(40% 0.04 285);
