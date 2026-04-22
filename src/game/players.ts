@@ -4,7 +4,6 @@ import type { Board, Difficulty, Mark, PlayerKind } from './types';
 export interface Player {
   readonly mark: Mark;
   readonly kind: PlayerKind;
-  readonly label: string;
   chooseMove(board: Board, signal: AbortSignal): Promise<number>;
 }
 
@@ -12,7 +11,7 @@ export class HumanPlayer implements Player {
   readonly kind: PlayerKind = 'human';
   private pending: ((idx: number) => void) | null = null;
 
-  constructor(readonly mark: Mark, readonly label = 'You') {}
+  constructor(readonly mark: Mark) {}
 
   chooseMove(_board: Board, signal: AbortSignal): Promise<number> {
     return new Promise<number>((resolve, reject) => {
@@ -47,7 +46,6 @@ export class CpuPlayer implements Player {
   constructor(
     readonly mark: Mark,
     readonly difficulty: Difficulty,
-    readonly label = 'CPU',
     private readonly thinkMs = 450,
   ) {}
 
