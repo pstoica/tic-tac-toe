@@ -3,7 +3,7 @@ import { animateDrawTitle, animateEndCardIn, animateLossTitle, animateWinTitle }
 import type { GameResult } from '../game/stats';
 import { DifficultyPicker } from './DifficultyPicker';
 import type { Difficulty } from '../game/types';
-import btn from '../styles/buttons.module.css';
+import { Button } from './Button';
 import styles from './EndScreen.module.css';
 
 interface EndScreenProps {
@@ -92,22 +92,12 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
           {result === 'draw' && 'dead even — rematch?'}
         </p>
         <div className={styles.endActions}>
-          <button
-            type="button"
-            className={`${btn.btn} ${btn.btnBlock}`}
-            style={{ '--btn-hue': accentHue } as React.CSSProperties}
-            onClick={() => onReplay(difficulty)}
-            autoFocus
-          >
+          <Button block hue={accentHue} onClick={() => onReplay(difficulty)} autoFocus>
             Play again
-          </button>
-          <button
-            type="button"
-            className={`${btn.btn} ${btn.btnBlock} ${btn.btnGhost}`}
-            onClick={() => setShowPicker(true)}
-          >
+          </Button>
+          <Button block ghost onClick={() => setShowPicker(true)}>
             Change difficulty
-          </button>
+          </Button>
         </div>
       </div>
     </div>

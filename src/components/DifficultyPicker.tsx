@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { animatePickerIn } from '../anim';
 import type { Difficulty } from '../game/types';
-import btn from '../styles/buttons.module.css';
+import { Button } from './Button';
 import styles from './DifficultyPicker.module.css';
 
 interface DifficultyPickerProps {
@@ -85,14 +85,9 @@ export function DifficultyPicker({
           );
         })}
       </div>
-      <button
-        type="button"
-        className={`${btn.btn} ${btn.btnBlock}`}
-        style={{ '--btn-hue': accentHue } as React.CSSProperties}
-        onClick={() => onConfirm(selected)}
-      >
+      <Button block hue={accentHue} onClick={() => onConfirm(selected)}>
         {ctaLabel}
-      </button>
+      </Button>
     </div>
   );
 }

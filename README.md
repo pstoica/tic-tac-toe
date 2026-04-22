@@ -27,6 +27,7 @@ src/
   components/
     Board.tsx             the 3x3 SVG grid, cell hit-testing, win slash
     Brand.tsx             the tic•tac•toe wordmark with the hue wave
+    Button.tsx            shared chunky pressable button (hue / block / ghost variants)
     DifficultyPicker.tsx  three tilted cards + start button
     EndScreen.tsx         win/loss/draw overlay with character-specific title animations
     GameSession.tsx       per-game state + Player driver loop
@@ -34,8 +35,6 @@ src/
     StatsBar.tsx          W/L/D counters and history strip with virtualized scroll
     WinSlash.tsx          eased slash grown from the midpoint
     *.module.css          per-component CSS module
-  styles/
-    buttons.module.css    shared chunky pressable button
   game/                   pure logic — no React, no DOM
     board.ts              board shape, evaluate, play, available moves
     constants.ts          HUMAN_MARK / CPU_MARK
@@ -52,7 +51,7 @@ src/
 
 **Animations are centralized.** `anim.ts` owns every anime.js call. Components hand it refs and get back either nothing or a cleanup function. The consequence is that components stay declarative and it's trivial to find/tweak the feel of any single animation.
 
-**CSS modules + a global foundation.** Per-component `.module.css` for everything that's component-specific; `global.css` holds palette variables, resets, the stage layout, and the `prefers-reduced-motion` escape hatch. Shared chunky button lives in `styles/buttons.module.css` and is imported by the two screens that use it.
+**CSS modules + a global foundation.** Per-component `.module.css` for everything that's component-specific; `global.css` holds palette variables, resets, the stage layout, and the `prefers-reduced-motion` escape hatch. The shared chunky button is a small `<Button>` component (`hue` / `block` / `ghost` props) so the variant class names don't leak into the two screens that use it.
 
 **Perfect play is actually perfect.** The minimax uses depth-penalized scoring (`WIN - depth` vs `depth - WIN`) so the CPU always takes the quicker win and the slower loss — which matters for the "take the win, don't just block" case. Self-play from the empty board is covered by a test that asserts the result is always a draw.
 
