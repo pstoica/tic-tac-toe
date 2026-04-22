@@ -107,6 +107,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
               ref={el => {
                 cellRefs.current[i] = el;
               }}
+              className={`${styles.cell}${disabled ? '' : ` ${styles.cellInteractive}`}`}
             >
               <rect
                 className={styles.cellBg}

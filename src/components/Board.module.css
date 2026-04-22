@@ -40,13 +40,15 @@
   opacity: 0;
 }
 
+/* opaque so the background shapes behind the board don't bleed through
+   the cells — the atmosphere lives *around* the play area, not under it */
 .cell-bg {
-  fill: oklch(18% 0.025 285 / 0.55);
-  stroke: oklch(40% 0.03 285 / 0.55);
+  fill: oklch(14% 0.025 285);
+  stroke: oklch(34% 0.03 285);
   stroke-width: 0.9;
   transition:
-    fill 180ms ease,
-    stroke 180ms ease;
+    fill 160ms ease,
+    stroke 160ms ease;
 }
 
 .cell-hit {
@@ -55,15 +57,24 @@
   outline: none;
 }
 
-.cell-hit:focus-visible + .cell-bg,
-.cell-hit:hover + .cell-bg {
-  /* tinted toward the current player's mark — previews where the piece lands */
-  fill: oklch(32% 0.07 var(--cell-hue, 285) / 0.75);
-  stroke: oklch(78% 0.14 var(--cell-hue, 285));
-}
-
 .cell-hit:disabled {
   cursor: default;
+}
+
+/* interactive cells: group-hover/focus/active styles the .cell-bg sibling
+   regardless of DOM order (the adjacent-sibling selector doesn't work here
+   because cell-bg is painted first, cell-hit second — no previous-sibling
+   combinator in CSS). */
+.cell-interactive:hover .cell-bg,
+.cell-interactive:focus-within .cell-bg {
+  /* tinted toward the current player's mark — previews where the piece lands */
+  fill: oklch(28% 0.08 var(--cell-hue, 285));
+  stroke: oklch(78% 0.16 var(--cell-hue, 285));
+}
+
+.cell-interactive:active .cell-bg {
+  fill: oklch(36% 0.1 var(--cell-hue, 285));
+  stroke: oklch(86% 0.18 var(--cell-hue, 285));
 }
 
 /* the cell-wrapping <g> gets scaled by the winning-line highlight, so it
