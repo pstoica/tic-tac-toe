@@ -313,6 +313,14 @@ export function animatePickerIn(cardEl: HTMLElement, optionEls: HTMLElement[]) {
     duration: 180,
     delay: stagger(28, { start: 60 }),
     ease: 'outQuart',
+    // anime.js leaves the final frame's transform inline, which outranks
+    // .btn:active's translateY in CSS and makes the press look dead. drop
+    // the inline transform once the stagger is done so CSS can take over.
+    onComplete: () => {
+      optionEls.forEach(el => {
+        el.style.transform = '';
+      });
+    },
   });
 }
 
@@ -323,22 +331,5 @@ export function animatePickerOut(cardEl: HTMLElement) {
     translateY: [0, -8],
     duration: 220,
     ease: 'outQuart',
-  });
-}
-
-/* Chunky-button press stamp — held through the picker exit so the click
-   reads as a deliberate press even though animatePickerOut is already
-   fading the whole picker off the screen. */
-export function animateCardPress(el: HTMLElement) {
-  if (prefersReducedMotion()) return;
-  animate(el, {
-    translateY: [
-      { to: 5, duration: 90, ease: 'outQuad' },
-      { to: 5, duration: 200 },
-    ],
-    scale: [
-      { to: 0.97, duration: 90, ease: 'outQuad' },
-      { to: 0.97, duration: 200 },
-    ],
   });
 }

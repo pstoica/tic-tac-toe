@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { ensureReady } from '@web-kits/audio';
-import { animateCardPress, animatePickerIn, animatePickerOut } from '../anim';
+import { animatePickerIn, animatePickerOut } from '../anim';
 import { useGameSounds } from '../audio';
 import type { Difficulty } from '../game/types';
 import styles from './DifficultyPicker.module.css';
@@ -38,13 +38,11 @@ export function DifficultyPicker({
     animatePickerIn(cardRef.current, opts);
   }, []);
 
-  const onSelect = async (value: Difficulty, index: number) => {
+  const onSelect = async (value: Difficulty) => {
     if (!cardRef.current) return;
     // first user gesture — unlocks the AudioContext for the rest of the session
     ensureReady();
     sounds.button();
-    const pressed = optionRefs.current[index];
-    if (pressed) animateCardPress(pressed);
     await animatePickerOut(cardRef.current);
     onConfirm(value);
   };
@@ -61,7 +59,7 @@ export function DifficultyPicker({
             }}
             type="button"
             className={styles.optCard}
-            onClick={() => onSelect(opt.value, i)}
+            onClick={() => onSelect(opt.value)}
             hue={opt.hue}
           >
             <span className={styles.optCardName}>{opt.name}</span>
