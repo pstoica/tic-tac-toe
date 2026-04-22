@@ -113,3 +113,15 @@ A running log of prompts supplied during this interview-project build.
 > you're drawing the X starting from the top left and bottom left. im starting to think the offset animation doesnt look good with the ghosting anyway. lets focus on making the ghosting look better. im still seeing no 3d rotation or variation.
 >
 > also start committing to git.
+
+---
+
+## Prompt 16 — 2026-04-22
+
+> i'm not seeing any variation, it's always along the same curves.
+>
+> there's still some layout shift from when we're starting the game. the header should feel more fixed, the body can go more below the centerfold.
+>
+> let's also provide a way to reset history.
+>
+> and let's make the difficulty selection feel more like a list of cards with stars, maintaining characterful type (e.g. wonky random rotation)

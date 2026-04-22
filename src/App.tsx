@@ -6,7 +6,7 @@ import { StatsBar } from './components/StatsBar';
 import { animateBrandHues } from './anim';
 import { EMPTY_BOARD, evaluate, opposite, play } from './game/board';
 import { CpuPlayer, HumanPlayer, type Player } from './game/players';
-import { appendResult, loadStats, saveStats, type GameResult } from './game/stats';
+import { appendResult, clearStats, EMPTY_STATS, loadStats, saveStats, type GameResult } from './game/stats';
 import type { Board as BoardType, Difficulty, Mark, Outcome } from './game/types';
 
 type Phase =
@@ -34,12 +34,17 @@ export function App() {
     setPhase({ kind: 'finished', difficulty, result });
   }, []);
 
+  const resetHistory = useCallback(() => {
+    clearStats();
+    setStats(EMPTY_STATS);
+  }, []);
+
   return (
     <div className="app">
       <div className="stage">
         <div className="stage__top">
           <Brand />
-          <StatsBar stats={stats} />
+          <StatsBar stats={stats} onReset={resetHistory} />
         </div>
 
         <div className="stage__main">

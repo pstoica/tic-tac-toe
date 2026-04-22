@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import type { GameResult, Stats } from '../game/stats';
 
 interface StatsBarProps {
   stats: Stats;
+  onReset: () => void;
 }
 
 const TOKEN: Record<GameResult, string> = {
@@ -10,8 +12,34 @@ const TOKEN: Record<GameResult, string> = {
   draw: 'D',
 };
 
-export function StatsBar({ stats }: StatsBarProps) {
+export function StatsBar({ stats, onReset }: StatsBarProps) {
+  const [confirming, setConfirming] = useState(false);
   const recent = stats.history.slice(-12);
+  const hasAny = stats.wins + stats.losses + stats.draws > 0;
+
+  if (confirming) {
+    return (
+      <div className="stats stats--confirm" role="alertdialog" aria-label="reset history confirmation">
+        <span className="stats__confirm-text">Reset history?</span>
+        <button
+          type="button"
+          className="stats__confirm-btn stats__confirm-btn--yes"
+          onClick={() => { onReset(); setConfirming(false); }}
+          autoFocus
+        >
+          Yes
+        </button>
+        <button
+          type="button"
+          className="stats__confirm-btn stats__confirm-btn--no"
+          onClick={() => setConfirming(false)}
+        >
+          No
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="stats" aria-label="win loss record">
       <div className="stats__group">
@@ -38,6 +66,17 @@ export function StatsBar({ stats }: StatsBarProps) {
             </span>
           ))}
         </div>
+      )}
+      {hasAny && (
+        <button
+          type="button"
+          className="stats__reset"
+          onClick={() => setConfirming(true)}
+          aria-label="reset history"
+          title="Reset history"
+        >
+          ×
+        </button>
       )}
     </div>
   );

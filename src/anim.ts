@@ -60,44 +60,59 @@ export function animateMarkGrow(groupEl: SVGGElement) {
   });
 }
 
-/* LERP trail on placement (iOS FaceID style): each ghost is a frozen pose
-   sampled along a shared shrink-and-rotate trajectory. only opacity animates
-   per ghost — the stagger of flashes creates the motion.
+/* deterministic pseudo-random in [0, 1) per (index, stream). keeps the
+   ghost trail feeling random while staying reproducible across runs. */
+function prand(i: number, stream: number): number {
+  const v = Math.sin(i * 12.9898 + stream * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+const jitter = (i: number, stream: number, amp: number): number =>
+  (prand(i, stream) - 0.5) * 2 * amp;
 
-   the per-ghost pose layers four things so there's visible variation across
-   the trail without breaking the LERP feel:
-     1. knurl rotation on Z (0 → -90°, within one X-symmetry unit)
-     2. scale shrink (0.92 → 0.10) toward the midpoint
-     3. real 3D tilt (rotateX / rotateY sine waves) — only renders if the
-        perspective context is preserved up the ancestor chain
-     4. non-uniform scale oscillation (scaleX / scaleY phase-shifted sines),
-        which reads as an aspect-ratio wobble and is the reliable fallback
-        for engines that flatten SVG 3D transforms */
+/* LERP trail on placement (iOS FaceID style): each ghost is a frozen pose;
+   only opacity animates, the stagger of flashes creates the motion.
+
+   each ghost layers a smooth trajectory + per-ghost deterministic jitter
+   so adjacent frames aren't just the next point on the same clean curve:
+     - base knurl rotation + rotation jitter ±18°
+     - shrink trajectory + per-axis independent scale jitter (non-uniform
+       per ghost, some wider-than-tall, some taller-than-wide)
+     - 3D tilt sine curves + rotateX/Y jitter (renders when the renderer
+       honors SVG 3D; even flat it affects scale via foreshortening)
+     - small position jitter so ghosts don't all pin to the exact center
+     - per-ghost opacity peak and lifetime so some flash brighter/longer */
 export function animateMarkGhosts(paths: SVGPathElement[]) {
   if (prefersReducedMotion()) return;
   const n = paths.length;
   if (n === 0) return;
   paths.forEach((el, i) => {
-    const t = n === 1 ? 0 : i / (n - 1);                // 0 → 1 across ghosts
-    const rotation = -90 * t;                            // knurl on Z
-    const base     = 0.92 - 0.82 * t;                    // shrink to midpoint
-    const rotateY  = 34 * Math.sin(t * Math.PI * 2);     // full wave ±34°
-    const rotateX  = -18 * Math.sin(t * Math.PI);        // half wave, peak mid
-    // phase-offset non-uniform scale so adjacent ghosts have distinctly
-    // different aspect ratios — fake 3D lean, visible even when real
-    // rotateX/Y gets flattened by the renderer.
-    const scaleX = base * (1 + 0.22 * Math.sin(t * Math.PI * 2));
-    const scaleY = base * (1 - 0.22 * Math.cos(t * Math.PI * 2));
+    const t = n === 1 ? 0 : i / (n - 1);
+    const base = 0.92 - 0.82 * t;
+
+    const rotation = -90 * t + jitter(i, 1, 18);
+    const scaleX   = base * (1 + jitter(i, 2, 0.28));
+    const scaleY   = base * (1 + jitter(i, 3, 0.28));
+    const rotateY  = 30 * Math.sin(t * Math.PI * 2) + jitter(i, 4, 18);
+    const rotateX  = -16 * Math.sin(t * Math.PI)    + jitter(i, 5, 14);
+    const tx       = jitter(i, 6, 6);
+    const ty       = jitter(i, 7, 6);
+
+    const peak       = 0.42 + prand(i, 8) * 0.33;   // 0.42 → 0.75
+    const fadeInMs   = 40 + Math.round(prand(i, 9) * 30);
+    const fadeOutMs  = 110 + Math.round(prand(i, 10) * 90);
+
     utils.set(el, {
       rotate: rotation,
       scaleX, scaleY,
       rotateX, rotateY,
+      translateX: tx,
+      translateY: ty,
       opacity: 0,
     });
     animate(el, {
       opacity: [
-        { to: 0.55, duration: 50,  ease: 'outQuad' },
-        { to: 0,    duration: 130, ease: 'outQuad' },
+        { to: peak, duration: fadeInMs,  ease: 'outQuad' },
+        { to: 0,    duration: fadeOutMs, ease: 'outQuad' },
       ],
       delay: i * 38,
     });

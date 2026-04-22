@@ -25,6 +25,14 @@ export const EMPTY_STATS: Stats = {
   history: [],
 };
 
+export function clearStats(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export function loadStats(): Stats {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);

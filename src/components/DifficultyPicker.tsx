@@ -12,13 +12,17 @@ interface DifficultyPickerProps {
 interface Option {
   value: Difficulty;
   name: string;
+  stars: number;
   hue: number;
+  tilt: number;
 }
 
+// tilts are deliberately small + fixed so the cards feel hand-placed without
+// jittering on re-render. one leans right, two lean left — asymmetric.
 const OPTIONS: Option[] = [
-  { value: 'easy',    name: 'Easy',    hue: 145 },
-  { value: 'smart',   name: 'Smart',   hue: 275 },
-  { value: 'perfect', name: 'Perfect', hue: 25  },
+  { value: 'easy',    name: 'Easy',    stars: 1, hue: 145, tilt: -2.2 },
+  { value: 'smart',   name: 'Smart',   stars: 2, hue: 275, tilt:  1.8 },
+  { value: 'perfect', name: 'Perfect', stars: 3, hue: 25,  tilt: -2.6 },
 ];
 
 export function DifficultyPicker({
@@ -52,12 +56,25 @@ export function DifficultyPicker({
               type="button"
               role="radio"
               aria-checked={isSelected}
-              className={`picker__option${isSelected ? ' picker__option--selected' : ''}`}
-              style={{ '--accent-hue': opt.hue } as React.CSSProperties}
+              className={`opt-card${isSelected ? ' opt-card--selected' : ''}`}
+              style={{
+                '--accent-hue': opt.hue,
+                '--tilt': `${opt.tilt}deg`,
+              } as React.CSSProperties}
               onClick={() => setSelected(opt.value)}
             >
-              <span className="picker__pip" />
-              <span>{opt.name}</span>
+              <span className="opt-card__name">{opt.name}</span>
+              <span className="opt-card__stars" aria-label={`${opt.stars} of 3`}>
+                {[1, 2, 3].map(n => (
+                  <span
+                    key={n}
+                    className={`opt-card__star opt-card__star--${n <= opt.stars ? 'on' : 'off'}`}
+                    aria-hidden="true"
+                  >
+                    ★
+                  </span>
+                ))}
+              </span>
             </button>
           );
         })}
