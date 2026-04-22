@@ -277,20 +277,48 @@ export function animateBrandHues(containerEl: HTMLElement) {
   return () => animations.forEach(a => a.pause());
 }
 
-/* "calculating" flicker — each letter gets a fresh random hue on every tick,
-   so instead of a coherent spectrum shift the wordmark reads as processing.
-   cheap setInterval rather than anime.js because the values are deliberately
-   discontinuous; no tween, no easing. */
+/* "calculating" flicker — each letter gets a fresh random hue on every tick
+   so the wordmark reads as processing rather than a coherent spectrum shift.
+   self-rescheduling setTimeout with an attack/release envelope on the tick
+   interval: ramps up fast for the first ~140ms (attack), then winds down
+   with an ease-in quad so the flicker gradually settles into a slow pulse
+   by the time the EndScreen is about to reveal. */
 export function animateBrandCalculating(containerEl: HTMLElement): () => void {
   const letters = Array.from(containerEl.children) as HTMLElement[];
+
+  const ATTACK_MS = 140;
+  const RELEASE_MS = 1160; // attack + release ≈ GameSession's 1300ms window
+  const FAST_INTERVAL = 45; // peak flicker rate
+  const SLOW_START = 180; // first tick before the attack ramps in
+  const SLOW_END = 300; // interval the release settles into
+
+  const startedAt = performance.now();
+  let timerId: number | null = null;
+
   const tick = () => {
     letters.forEach(el => {
       el.style.setProperty('--letter-hue', String(Math.floor(Math.random() * 360)));
     });
+    const elapsed = performance.now() - startedAt;
+    let next: number;
+    if (elapsed < ATTACK_MS) {
+      // interpolate SLOW_START → FAST_INTERVAL linearly over the attack window
+      const t = elapsed / ATTACK_MS;
+      next = SLOW_START + (FAST_INTERVAL - SLOW_START) * t;
+    } else {
+      const t = Math.min((elapsed - ATTACK_MS) / RELEASE_MS, 1);
+      // ease-in quad — flicker holds fast for most of the release, then
+      // audibly winds down into the reveal
+      next = FAST_INTERVAL + (SLOW_END - FAST_INTERVAL) * t * t;
+    }
+    timerId = window.setTimeout(tick, next);
   };
+
   tick(); // first jump happens immediately so the switch feels instant
-  const id = window.setInterval(tick, 75);
-  return () => window.clearInterval(id);
+
+  return () => {
+    if (timerId !== null) window.clearTimeout(timerId);
+  };
 }
 
 /* ============================================================

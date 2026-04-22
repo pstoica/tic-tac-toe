@@ -30,6 +30,17 @@ export function GameSession({ difficulty, onFinish, onCalculating }: GameSession
   const busy = players[current].kind === 'cpu' && outcome.kind === 'ongoing';
   const finishedRef = useRef(false);
 
+  // parent callbacks can re-identify on every render (e.g. an inline arrow
+  // around onFinish). keeping them in refs means the end-of-game effect only
+  // depends on `outcome`, so it doesn't re-run and clobber its own timer
+  // when App re-renders in the middle of the 1300ms resolving window.
+  const onFinishRef = useRef(onFinish);
+  const onCalculatingRef = useRef(onCalculating);
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+    onCalculatingRef.current = onCalculating;
+  });
+
   useEffect(() => {
     if (outcome.kind !== 'ongoing') return;
     const player = players[current];
@@ -54,12 +65,12 @@ export function GameSession({ difficulty, onFinish, onCalculating }: GameSession
   useEffect(() => {
     if (outcome.kind === 'ongoing' || finishedRef.current) return;
     finishedRef.current = true;
-    onCalculating?.();
+    onCalculatingRef.current?.();
     const result: GameResult =
       outcome.kind === 'draw' ? 'draw' : outcome.winner === HUMAN_MARK ? 'win' : 'loss';
-    const t = window.setTimeout(() => onFinish(result), 1300);
+    const t = window.setTimeout(() => onFinishRef.current(result), 1300);
     return () => window.clearTimeout(t);
-  }, [outcome, onFinish, onCalculating]);
+  }, [outcome]);
 
   const handleCellClick = useCallback(
     (idx: number) => {
