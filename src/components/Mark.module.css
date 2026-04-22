@@ -12,6 +12,9 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 8;
+  transition:
+    stroke 380ms ease,
+    filter 380ms ease;
 }
 
 .mark--X .mark__path {
@@ -22,6 +25,13 @@
 .mark--O .mark__path {
   stroke: oklch(86% 0.18 235);
   filter: drop-shadow(0 0 10px oklch(86% 0.18 235 / 0.5));
+}
+
+/* winning trio — CSS transitions the stroke + glow to --win-color;
+   the scale pop animation is driven from anim.ts on the same elements */
+.mark--winning .mark__path {
+  stroke: var(--win-color);
+  filter: drop-shadow(0 0 14px oklch(88% 0.18 145 / 0.7));
 }
 
 /* LERP trail frames — each ghost is a frozen pose, only opacity animates.

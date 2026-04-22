@@ -25,15 +25,14 @@ src/
   global.css              palette, resets, stage layout, reduced-motion
   anim.ts                 every anime.js call lives here; components just hand it refs
   components/
-    Board.tsx             the 3x3 SVG grid, cell hit-testing, win slash
+    Board.tsx             the 3x3 SVG grid + cell hit-testing
     Brand.tsx             the tic•tac•toe wordmark with the hue wave
     Button.tsx            shared chunky pressable button (hue / block / ghost variants)
     DifficultyPicker.tsx  three tilted cards + start button
     EndScreen.tsx         win/loss/draw overlay with character-specific title animations
     GameSession.tsx       per-game state + Player driver loop
-    Mark.tsx              X / O with the ghost-particle trail
+    Mark.tsx              X / O with the ghost-particle trail + winning-trio recolor
     StatsBar.tsx          W/L/D counters and history strip with virtualized scroll
-    WinSlash.tsx          eased slash grown from the midpoint
     *.module.css          per-component CSS module
   game/                   pure logic — no React, no DOM
     board.ts              board shape, evaluate, play, available moves

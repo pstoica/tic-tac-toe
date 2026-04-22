@@ -1,8 +1,7 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { animateBoardIn, dimNonWinningMarks, highlightWinningMarks } from '../anim';
 import type { Board as BoardType, Mark as MarkType, Outcome } from '../game/types';
 import { Mark } from './Mark';
-import { WinSlash } from './WinSlash';
 import styles from './Board.module.css';
 
 interface BoardProps {
@@ -16,11 +15,6 @@ interface BoardProps {
 const VIEW = 300;
 const CELL = VIEW / 3;
 
-const cellCenter = (i: number) => ({
-  cx: (i % 3) * CELL + CELL / 2,
-  cy: Math.floor(i / 3) * CELL + CELL / 2,
-});
-
 export function Board({ board, outcome, current, busy, onCellClick }: BoardProps) {
   const cellRefs = useRef<(SVGGElement | null)[]>([]);
   const gridRefs = useRef<(SVGLineElement | null)[]>([]);
@@ -32,6 +26,8 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
     const lines = gridRefs.current.filter((c): c is SVGLineElement => !!c);
     animateBoardIn(cells, lines);
   }, []);
+
+  const winningSet = outcome.kind === 'win' ? new Set<number>(outcome.line) : null;
 
   // when game ends, dim non-winning marks and pop the winning trio
   useEffect(() => {
@@ -45,14 +41,6 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
     });
     dimNonWinningMarks(losing);
     highlightWinningMarks(winning);
-  }, [outcome]);
-
-  const winLine = useMemo(() => {
-    if (outcome.kind !== 'win') return null;
-    const [a, , c] = outcome.line;
-    const A = cellCenter(a);
-    const C = cellCenter(c);
-    return { x1: A.cx, y1: A.cy, x2: C.cx, y2: C.cy };
   }, [outcome]);
 
   return (
@@ -205,14 +193,17 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
                 }}
                 className={styles.markCell}
               >
-                <Mark mark={cell} cx={center} cy={center} size={52} />
+                <Mark
+                  mark={cell}
+                  cx={center}
+                  cy={center}
+                  size={52}
+                  winning={winningSet?.has(i) ?? false}
+                />
               </g>
             </svg>
           );
         })}
-
-        {/* winning slash */}
-        {winLine && <WinSlash {...winLine} />}
       </svg>
     </div>
   );

@@ -8,6 +8,8 @@ interface MarkProps {
   cx: number;
   cy: number;
   size?: number;
+  /** part of the winning trio — recolored to --win-color, CSS handles the fade */
+  winning?: boolean;
 }
 
 const MARK_PATH = (mark: MarkType, cx: number, cy: number, s: number): string => {
@@ -19,7 +21,7 @@ const MARK_PATH = (mark: MarkType, cx: number, cy: number, s: number): string =>
   return `M ${cx - h} ${cy - h} L ${cx + h} ${cy + h} M ${cx + h} ${cy - h} L ${cx - h} ${cy + h}`;
 };
 
-export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
+export function Mark({ mark, cx, cy, size = 56, winning = false }: MarkProps) {
   const groupRef = useRef<SVGGElement>(null);
   const ghostRefs = useRef<(SVGPathElement | null)[]>([]);
 
@@ -31,9 +33,12 @@ export function Mark({ mark, cx, cy, size = 56 }: MarkProps) {
 
   const d = MARK_PATH(mark, cx, cy, size);
   const variantClass = mark === 'X' ? styles.markX : styles.markO;
+  const className = [styles.mark, variantClass, winning && styles.markWinning]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <g className={`${styles.mark} ${variantClass}`}>
+    <g className={className}>
       <g className={styles.markGhosts}>
         {Array.from({ length: GHOST_COUNT }, (_, i) => (
           <path

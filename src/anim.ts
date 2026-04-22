@@ -15,14 +15,6 @@ const prefersReducedMotion = (): boolean =>
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 
-function pathLength(el: SVGGeometryElement): number {
-  try {
-    return el.getTotalLength();
-  } catch {
-    return 100;
-  }
-}
-
 // uniform random in [min, max] — makes the ghost params read as ranges
 const rand = (min: number, max: number): number => min + Math.random() * (max - min);
 const irand = (min: number, max: number): number => Math.round(rand(min, max));
@@ -130,31 +122,10 @@ export function animateMarkGhosts(paths: SVGPathElement[]) {
 }
 
 /* ============================================================
-   win slash — eased grow from midpoint outward
+   end-of-game mark emphasis
    ============================================================ */
 
-export function animateWinSlash(half1: SVGLineElement, half2: SVGLineElement) {
-  const len1 = pathLength(half1);
-  const len2 = pathLength(half2);
-  half1.style.strokeDasharray = `${len1}`;
-  half1.style.strokeDashoffset = `${len1}`;
-  half2.style.strokeDasharray = `${len2}`;
-  half2.style.strokeDashoffset = `${len2}`;
-
-  if (prefersReducedMotion()) {
-    half1.style.strokeDashoffset = '0';
-    half2.style.strokeDashoffset = '0';
-    return;
-  }
-
-  animate([half1, half2], {
-    strokeDashoffset: 0,
-    duration: 620,
-    ease: 'outExpo',
-  });
-}
-
-/* dim the non-winning marks so the slash + line shine */
+/* dim the non-winning marks so the winning trio reads as the focal point */
 export function dimNonWinningMarks(marks: SVGGElement[]) {
   if (prefersReducedMotion()) return;
   animate(marks, {

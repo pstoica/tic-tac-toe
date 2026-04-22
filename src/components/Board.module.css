@@ -78,7 +78,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 5px 16px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: oklch(16% 0.03 285 / 0.85);
   border: 1px solid oklch(35% 0.06 var(--turn-hue, 25) / 0.7);
@@ -102,7 +102,7 @@
   color: oklch(16% 0.06 var(--turn-hue, 25));
   box-shadow: 0 0 12px oklch(86% 0.18 var(--turn-hue, 25) / 0.55);
   /* optically nest with the pill's left curve instead of floating inside it */
-  margin-left: -10px;
+  margin-left: -4px;
 }
 
 .turn--hidden {
