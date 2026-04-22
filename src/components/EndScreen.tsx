@@ -82,7 +82,7 @@ export function EndScreen({ result, difficulty, onReplay }: EndScreenProps) {
               className={styles.endChar}
               aria-hidden="true"
             >
-              {ch === ' ' ? ' ' : ch}
+              {ch === ' ' ? ' ' : ch}
             </span>
           ))}
         </h2>

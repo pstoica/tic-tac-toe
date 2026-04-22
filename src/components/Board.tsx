@@ -76,6 +76,7 @@ export function Board({ board, outcome, current, busy, onCellClick }: BoardProps
       </div>
       <svg
         className={styles.board}
+        style={{ '--cell-hue': current === 'X' ? 25 : 235 } as React.CSSProperties}
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         role="grid"
         aria-label="tic tac toe board"

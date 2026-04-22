@@ -57,8 +57,9 @@
 
 .cell-hit:focus-visible + .cell-bg,
 .cell-hit:hover + .cell-bg {
-  fill: oklch(26% 0.035 285 / 0.85);
-  stroke: oklch(72% 0.04 285);
+  /* tinted toward the current player's mark — previews where the piece lands */
+  fill: oklch(32% 0.07 var(--cell-hue, 285) / 0.75);
+  stroke: oklch(78% 0.14 var(--cell-hue, 285));
 }
 
 .cell-hit:disabled {
@@ -102,7 +103,7 @@
   color: oklch(16% 0.06 var(--turn-hue, 25));
   box-shadow: 0 0 12px oklch(86% 0.18 var(--turn-hue, 25) / 0.55);
   /* optically nest with the pill's left curve instead of floating inside it */
-  margin-left: -4px;
+  margin-left: -6px;
 }
 
 .turn--hidden {
