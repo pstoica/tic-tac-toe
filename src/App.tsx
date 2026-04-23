@@ -51,7 +51,7 @@ export function App() {
 
   return (
     <>
-      <Background />
+      <Background dim={phase.kind === 'playing'} />
       <div className="app">
         <div className="stage">
           <div className="stage__top">

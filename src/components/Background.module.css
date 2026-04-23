@@ -18,6 +18,12 @@
   /* 3D context so rotateX / rotateY on the nested layers foreshortens */
   perspective: 900px;
   transform-style: preserve-3d;
+  transition: opacity 520ms ease;
+}
+
+/* during play the shapes step back so they don't pull focus from the board */
+.bg--dim {
+  opacity: 0.35;
 }
 
 .shapeSlot {

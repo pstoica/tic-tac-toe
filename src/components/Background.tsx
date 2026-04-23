@@ -74,12 +74,17 @@ function buildShapes(): Shape[] {
   });
 }
 
-export function Background() {
+interface BackgroundProps {
+  /** quiets the floating shapes while the user is focused on the board */
+  dim?: boolean;
+}
+
+export function Background({ dim = false }: BackgroundProps) {
   // lock positions at mount so re-renders don't re-roll the layout
   const shapes = useMemo(() => buildShapes(), []);
 
   return (
-    <div className={styles.bg} aria-hidden="true">
+    <div className={`${styles.bg}${dim ? ` ${styles.bgDim}` : ''}`} aria-hidden="true">
       {shapes.map((s, i) => (
         <div
           key={i}

@@ -27,6 +27,9 @@ const TOKEN_CLASS: Record<GameResult, string> = {
   draw: styles.statsTokenDraw,
 };
 
+// keeps the strip narrow enough to fit the pill within the stage on mobile
+const STRIP_CAP = 10;
+
 export function StatsBar({ stats, onReset }: StatsBarProps) {
   const [confirming, setConfirming] = useState(false);
   const hasAny = stats.wins + stats.losses + stats.draws > 0;
@@ -63,7 +66,7 @@ export function StatsBar({ stats, onReset }: StatsBarProps) {
     );
   }
 
-  const recent = stats.history.slice(-12);
+  const recent = stats.history.slice(-STRIP_CAP);
 
   return (
     <div className={styles.stats} aria-label="win loss record">
@@ -186,9 +189,10 @@ function StatsStrip({ recent }: StatsStripProps) {
   }, [recent]);
 
   // visible width = visible token count × slot step − trailing gap. clamped
-  // at 12 because during the cap transition `displayed` briefly carries 13
-  // entries (the outgoing one), and the strip should hold its 188px ceiling.
-  const visibleCount = Math.min(displayed.length, 12);
+  // at STRIP_CAP because during the cap transition `displayed` briefly
+  // carries cap+1 entries (the outgoing one), and the strip should hold
+  // its ceiling width.
+  const visibleCount = Math.min(displayed.length, STRIP_CAP);
   const stripWidth = Math.max(0, visibleCount * TOKEN_STEP - 4);
 
   return (

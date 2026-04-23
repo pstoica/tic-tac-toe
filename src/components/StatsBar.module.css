@@ -19,6 +19,12 @@
     background 160ms ease;
 }
 
+@media (max-width: 480px) {
+  .stats {
+    gap: 8px;
+  }
+}
+
 .stats--confirm {
   border-color: oklch(68% 0.14 25 / 0.7);
   background: oklch(18% 0.05 25 / 0.8);
