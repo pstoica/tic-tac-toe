@@ -90,7 +90,9 @@ button {
 
 .app {
   min-height: 100dvh;
-  padding: 7dvh 20px 4dvh;
+  /* trimmed from 7dvh/4dvh so the stage fits on iPhone SE with the
+     address bar visible without forcing vertical scroll */
+  padding: 5dvh 20px 3dvh;
   display: grid;
   align-content: start;
   justify-items: center;
@@ -119,8 +121,10 @@ button {
   display: grid;
   place-items: center;
   position: relative;
-  /* sized for the board + turn pill so it never shrinks back to picker size */
-  min-height: clamp(460px, 58dvh, 480px);
+  /* reserve room for the board + turn pill so swaps don't shift the header.
+     floor trimmed from 460 → 360 so small viewports don't force a scroll —
+     board still fits (88vmin cap naturally shrinks with viewport). */
+  min-height: clamp(360px, 58dvh, 480px);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -119,6 +119,9 @@
   font-weight: 800;
   font-size: 13px;
   letter-spacing: 0;
+  /* reserve room for up to 3 digits so going 1 → 99+ doesn't widen the
+     pill on each new stat (combined with tabular-nums above) */
+  min-width: 22px;
 }
 
 .stats__value--win {
